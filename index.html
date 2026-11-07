@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>學測國文刷題</title>
+
+<!-- 就是這兩行！讓 LINE 預覽變漂亮 -->
+<meta property="og:title" content="學測國文刷題系統">
+<meta property="og:description" content="收錄 110-116 學測國文歷屆選擇題。提供隨機刷題、依年度練習、錯題複習與深淺色模式。">
+
 <style>
   /* 顏色變數設定：加入 html[data-theme] 來強制切換 */
   :root {
@@ -84,12 +89,9 @@
     max-width: 640px;
     margin: 0 auto;
     padding: 20px;
-    padding-top: 85px; /* 留給右上角按鈕的空間 */
+    padding-top: 85px;
   }
 
-  /* ==========================================
-     修改：右上角切換模式按鈕 (固定小圓形 + 縮小文字)
-     ========================================== */
   .theme-toggle {
     position: fixed;
     top: 24px;
@@ -97,28 +99,24 @@
     z-index: 999;
     background: var(--card);
     border: 1px solid var(--bd);
-    border-radius: 50%; /* 完美正圓形 */
-    width: 44px;        /* 恢復原本的 44px 大小 */
+    border-radius: 50%;
+    width: 44px;
     height: 44px;
     display: flex;
-    flex-direction: column; /* 讓文字上下排列 */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow);
-    font-size: 0.65rem; /* 縮小字體，確保不超出圓形 */
+    font-size: 0.65rem;
     font-weight: 500;
-    line-height: 1.1;   /* 緊湊行距 */
+    line-height: 1.1;
     color: var(--fg);
     padding: 0;
     margin: 0;
     transition: all 0.2s ease;
   }
-  .theme-toggle:hover { 
-    transform: translateY(-2px); 
-    border-color: var(--ac);
-    color: var(--ac);
-  }
+  .theme-toggle:hover { transform: translateY(-2px); border-color: var(--ac); color: var(--ac); }
 
   .card {
     background: var(--card);
@@ -130,7 +128,6 @@
     transition: background 0.3s ease, border-color 0.3s ease;
   }
 
-  /* 系統公告樣式 */
   .sys-notice {
     background: var(--notice-bg);
     border: 1px solid var(--notice-bd);
@@ -148,147 +145,83 @@
   .sys-notice-icon { font-size: 1.2rem; line-height: 1.2; }
   .sys-notice-content { flex: 1; }
 
-  /* 標題列與版本按鈕 */
-  .header-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
   .header-row h2 { margin: 0; font-size: 1.5rem; }
   .btn-version {
-    padding: 4px 10px;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    margin: 0;
-    background: var(--bg);
-    border-color: var(--bd);
-    color: var(--fg);
-    opacity: 0.8;
+    padding: 4px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0;
+    background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8;
   }
   .btn-version:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
 
-  /* 彈出視窗 (Modal) 樣式 */
   .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
+    z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease;
   }
   .modal-overlay.active { opacity: 1; visibility: visible; }
   .modal-content {
-    background: var(--card);
-    padding: 24px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    max-width: 90%;
-    width: 400px;
-    transform: translateY(20px);
-    transition: all 0.2s ease;
-    border: 1px solid var(--bd);
-    white-space: pre-wrap;
-    line-height: 1.8;
+    background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow);
+    max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease;
+    border: 1px solid var(--bd); white-space: pre-wrap; line-height: 1.8;
   }
   .modal-overlay.active .modal-content { transform: translateY(0); }
-  .modal-content h3 {
-    margin-top: 0; margin-bottom: 16px; font-size: 1.2rem;
-    border-bottom: 1px solid var(--bd); padding-bottom: 10px;
-  }
+  .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; }
   .modal-close { width: 100%; margin-top: 20px; }
 
   p { margin-top: 0; margin-bottom: 16px; }
 
   button, select {
-    font: inherit;
-    color: inherit;
-    background: var(--card);
-    border: 1px solid var(--bd);
-    border-radius: 8px;
-    padding: 10px 16px;
-    margin: 4px 0;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font: inherit; color: inherit; background: var(--card);
+    border: 1px solid var(--bd); border-radius: 8px; padding: 10px 16px; margin: 4px 0;
+    cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
   button:hover, select:hover { border-color: var(--ac); transform: translateY(-1px); }
   button:active { transform: translateY(1px); }
   select {
-    appearance: none;
-    padding-right: 32px;
+    appearance: none; padding-right: 32px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
+    background-repeat: no-repeat; background-position: right 12px center;
   }
 
   .opt {
-    display: block; width: 100%; text-align: left;
-    padding: 16px; margin-bottom: 12px; border-radius: 10px;
-    background: var(--bg); line-height: 1.5; letter-spacing: 0.5px; box-shadow: none;
+    display: block; width: 100%; text-align: left; padding: 16px; margin-bottom: 12px;
+    border-radius: 10px; background: var(--bg); line-height: 1.5; letter-spacing: 0.5px; box-shadow: none;
   }
-  .opt:hover {
-    background: color-mix(in srgb, var(--ac) 8%, var(--card));
-    border-color: var(--ac);
-  }
+  .opt:hover { background: color-mix(in srgb, var(--ac) 8%, var(--card)); border-color: var(--ac); }
   .sel {
-    border-color: var(--ac) !important;
-    background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important;
+    border-color: var(--ac) !important; background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important;
     outline: 2px solid var(--ac); outline-offset: -2px;
   }
-  .ok {
-    border-color: var(--ok) !important;
-    background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important;
-    color: var(--ok);
-  }
-  .no {
-    border-color: var(--no) !important;
-    background: color-mix(in srgb, var(--no) 15%, var(--card)) !important;
-    color: var(--no);
-  }
+  .ok { border-color: var(--ok) !important; background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important; color: var(--ok); }
+  .no { border-color: var(--no) !important; background: color-mix(in srgb, var(--no) 15%, var(--card)) !important; color: var(--no); }
 
   .go {
-    background: var(--ac); color: #fff; border: none; font-weight: bold;
-    width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px;
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent);
+    background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%;
+    padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent);
   }
-  .go:hover {
-    background: var(--ac-hover); transform: translateY(-2px);
-    box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent);
-  }
+  .go:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
   .meta {
-    color: var(--fg); opacity: 0.6; font-size: 0.9rem;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px;
-    border-bottom: 1px dashed var(--bd);
+    color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);
   }
   .meta button { padding: 6px 12px; font-size: 0.85rem; margin: 0; }
-
-  .feedback {
-    margin-top: 20px; padding: 16px; border-radius: 8px;
-    background: var(--bg); border-left: 4px solid var(--ac);
-  }
+  .feedback { margin-top: 20px; padding: 16px; border-radius: 8px; background: var(--bg); border-left: 4px solid var(--ac); }
 </style>
 </head>
 <body>
 
-<!-- 右上角深淺色切換按鈕 (小圓形 + 縮小文字) -->
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">深色<br>模式</button>
 
-<main id="app">110~116學測國文歷屆試題刷題題庫</main>
+<!-- 這裡保持空白的就好，JS 會自動塞東西進去 -->
+<main id="app"></main>
 
-<!-- 彈出視窗 (預設隱藏) -->
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
     <div>
       ★當前版本：V1.0.0<br>
-      ★版本內容：新增110~115學測歷屆試題<br>
+      ★版本內容：新增110~116學測歷屆試題<br>
       ★更新時間：11/08 01:30
     </div>
     <button class="go modal-close" onclick="closeVersionModal()">關閉</button>
@@ -315,11 +248,9 @@ function initTheme() {
 function toggleTheme() {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   let newTheme;
-  if (currentTheme === 'dark') {
-    newTheme = 'light';
-  } else if (currentTheme === 'light') {
-    newTheme = 'dark';
-  } else {
+  if (currentTheme === 'dark') { newTheme = 'light'; } 
+  else if (currentTheme === 'light') { newTheme = 'dark'; } 
+  else {
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     newTheme = isDark ? 'light' : 'dark';
   }
@@ -329,12 +260,11 @@ function toggleTheme() {
   updateThemeText(newTheme);
 }
 
-// 更新按鈕文字 (使用 <br> 讓文字上下排列)
 function updateThemeText(theme) {
   if (theme === 'dark') {
-    themeToggleBtn.innerHTML = '淺色<br>模式'; // 深色模式時，按鈕顯示「淺色模式」
+    themeToggleBtn.innerHTML = '淺色<br>模式';
   } else {
-    themeToggleBtn.innerHTML = '深色<br>模式'; // 淺色模式時，按鈕顯示「深色模式」
+    themeToggleBtn.innerHTML = '深色<br>模式';
   }
 }
 
@@ -343,7 +273,7 @@ initTheme();
 // ==========================================
 // 🌟 系統設定與公告
 // ==========================================
-const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+const SYSTEM_NOTICE = "📢 歡迎使用學測國文刷題系統！\n目前已收錄 110-116 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 const A=document.getElementById("app");
@@ -354,9 +284,7 @@ const L="ABCDE";
 
 Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
 
-function openVersionModal() {
-  document.getElementById('versionModal').classList.add('active');
-}
+function openVersionModal() { document.getElementById('versionModal').classList.add('active'); }
 function closeVersionModal(e) {
   if (!e || e.target === document.getElementById('versionModal') || e.target.tagName === 'BUTTON') {
     document.getElementById('versionModal').classList.remove('active');
@@ -365,7 +293,6 @@ function closeVersionModal(e) {
 
 function home(){
   const s=S(),ys=[...new Set(Q.map(q=>q.y))];
-  
   let noticeHTML = "";
   if (SYSTEM_NOTICE.trim() !== "") {
     noticeHTML = `
