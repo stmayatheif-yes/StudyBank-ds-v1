@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>學測國文刷題</title>
 
-<!-- 就是這兩行！讓 LINE 預覽變漂亮 -->
 <meta property="og:title" content="學測國文刷題系統">
 <meta property="og:description" content="收錄 110-116 學測國文歷屆選擇題。提供隨機刷題、依年度練習、錯題複習與深淺色模式。">
 
@@ -153,6 +152,7 @@
   }
   .btn-version:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
 
+  /* 彈出視窗 (Modal) 樣式 */
   .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
@@ -163,10 +163,43 @@
     background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow);
     max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease;
     border: 1px solid var(--bd); white-space: pre-wrap; line-height: 1.8;
+    position: relative; /* 為了讓內部按鈕好定位 */
   }
   .modal-overlay.active .modal-content { transform: translateY(0); }
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; }
-  .modal-close { width: 100%; margin-top: 20px; }
+  
+  /* 歷史版本列表樣式 */
+  .history-list {
+    margin-top: 10px;
+    padding-left: 10px;
+    border-left: 2px solid var(--bd);
+    font-size: 0.95rem;
+  }
+  .history-item { margin-bottom: 12px; }
+  .history-item strong { color: var(--ac); display: block; margin-bottom: 2px; }
+
+  /* Modal 按鈕區塊 */
+  .modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--bd);
+    font-weight: normal;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--ac) 10%, var(--card));
+    border-color: var(--ac);
+  }
 
   p { margin-top: 0; margin-bottom: 16px; }
 
@@ -213,18 +246,46 @@
 
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">深色<br>模式</button>
 
-<!-- 這裡保持空白的就好，JS 會自動塞東西進去 -->
 <main id="app"></main>
 
+<!-- 彈出視窗 1：當前版本內容 -->
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
     <div>
-      ★當前版本：V1.0.0<br>
-      ★版本內容：新增110~116學測歷屆試題<br>
-      ★更新時間：11/08 01:30
+      ★當前版本：V1.2.0<br>
+      ★版本內容：新增深色模式/淺色模式切換功能<br>
+      ★更新時間：11/08 02:30
     </div>
-    <button class="go modal-close" onclick="closeVersionModal()">關閉</button>
+    <div class="modal-actions">
+      <!-- 點擊此按鈕切換到歷史版本 -->
+      <button class="btn-secondary" onclick="switchModal('versionModal', 'historyModal')">歷來版本一覽</button>
+      <button class="go" onclick="closeVersionModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 彈出視窗 2：歷來版本一覽 -->
+<div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>📜 歷來版本</h3>
+    <div class="history-list">
+      <div class="history-item">
+        <strong>v1.2.0</strong>
+        新增深色模式/淺色模式切換功能。
+      </div>
+      <div class="history-item">
+        <strong>v1.1.0</strong>
+        新增公告與版本內容功能。
+      </div>
+      <div class="history-item">
+        <strong>v1.0.0</strong>
+        新增110~115歷屆試題。
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="go" onclick="closeVersionModal()">關閉</button>
+    </div>
   </div>
 </div>
 
@@ -273,7 +334,7 @@ initTheme();
 // ==========================================
 // 🌟 系統設定與公告
 // ==========================================
-const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-116 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+const SYSTEM_NOTICE = "📢 歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 const A=document.getElementById("app");
@@ -284,13 +345,30 @@ const L="ABCDE";
 
 Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
 
-function openVersionModal() { document.getElementById('versionModal').classList.add('active'); }
+// ==========================================
+// 📋 彈出視窗邏輯 (包含切換功能)
+// ==========================================
+function openVersionModal() { 
+  document.getElementById('versionModal').classList.add('active'); 
+}
+
+// 關閉所有彈窗
 function closeVersionModal(e) {
-  if (!e || e.target === document.getElementById('versionModal') || e.target.tagName === 'BUTTON') {
+  if (!e || e.target.classList.contains('modal-overlay') || e.target.tagName === 'BUTTON') {
     document.getElementById('versionModal').classList.remove('active');
+    document.getElementById('historyModal').classList.remove('active');
   }
 }
 
+// 切換不同的彈窗
+function switchModal(closeId, openId) {
+  document.getElementById(closeId).classList.remove('active');
+  document.getElementById(openId).classList.add('active');
+}
+
+// ==========================================
+// 📝 刷題主邏輯
+// ==========================================
 function home(){
   const s=S(),ys=[...new Set(Q.map(q=>q.y))];
   let noticeHTML = "";
