@@ -18,6 +18,11 @@
     --ac-hover: #2563eb;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --radius: 12px;
+    
+    /* 新增：公告區塊專用顏色 */
+    --notice-bg: #eff6ff;
+    --notice-bd: #bfdbfe;
+    --notice-fg: #1e3a8a;
   }
   
   @media(prefers-color-scheme: dark) {
@@ -31,6 +36,11 @@
       --ac: #60a5fa;
       --ac-hover: #3b82f6;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      
+      /* 新增：公告區塊深色模式顏色 */
+      --notice-bg: #1e3a8a33;
+      --notice-bd: #1e40af;
+      --notice-fg: #bfdbfe;
     }
   }
 
@@ -49,7 +59,7 @@
     padding: 20px;
   }
 
-  /* 卡片容器 (套用在題目、首頁) */
+  /* 卡片容器 */
   .card {
     background: var(--card);
     border-radius: var(--radius);
@@ -57,6 +67,29 @@
     box-shadow: var(--shadow);
     margin-bottom: 20px;
     border: 1px solid var(--bd);
+  }
+
+  /* 新增：系統公告樣式 */
+  .sys-notice {
+    background: var(--notice-bg);
+    border: 1px solid var(--notice-bd);
+    color: var(--notice-fg);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    white-space: pre-wrap; /* 讓換行符號生效 */
+  }
+  .sys-notice-icon {
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+  .sys-notice-content {
+    flex: 1;
   }
 
   h2 {
@@ -101,7 +134,7 @@
     background-position: right 12px center;
   }
 
-  /* 題目選項按鈕 (滿版) */
+  /* 題目選項按鈕 */
   .opt {
     display: block;
     width: 100%;
@@ -112,7 +145,7 @@
     background: var(--bg);
     line-height: 1.5;
     letter-spacing: 0.5px;
-    box-shadow: none; /* 移除選項陰影，保持簡潔 */
+    box-shadow: none;
   }
 
   .opt:hover {
@@ -120,7 +153,6 @@
     border-color: var(--ac);
   }
 
-  /* 選中狀態 */
   .sel {
     border-color: var(--ac) !important;
     background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important;
@@ -128,21 +160,19 @@
     outline-offset: -2px;
   }
 
-  /* 答對狀態 */
   .ok {
     border-color: var(--ok) !important;
     background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important;
     color: var(--ok);
   }
 
-  /* 答錯狀態 */
   .no {
     border-color: var(--no) !important;
     background: color-mix(in srgb, var(--no) 15%, var(--card)) !important;
     color: var(--no);
   }
 
-  /* 主要行動按鈕 (送出、下一題、開始) */
+  /* 主要行動按鈕 */
   .go {
     background: var(--ac);
     color: #fff;
@@ -161,7 +191,7 @@
     box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent);
   }
 
-  /* 次要文字 (統計資訊、作答進度) */
+  /* 次要文字 */
   .meta {
     color: var(--fg);
     opacity: 0.6;
@@ -196,6 +226,14 @@
 <main id="app">載入中…</main>
 
 <script>
+// ==========================================
+// 🌟 系統公告設定區 🌟
+// 如果要更改公告，只要修改這裡的文字即可。
+// 若留空字串 ""，就不會顯示公告。
+// 可以用 \n 來換行。
+// ==========================================
+const SYSTEM_NOTICE = "📢 歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+
 // 若要同步到 Google Sheet，把 Apps Script 網頁應用程式網址貼在這裡（留空＝只存本機）
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
@@ -206,10 +244,22 @@ const save=s=>{try{localStorage.setItem("qb",JSON.stringify(s))}catch(e){}};
 const L="ABCDE";
 Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
 
-// [僅修改了 HTML 的結構，加上 div.card 使其變成卡片]
 function home(){
   const s=S(),ys=[...new Set(Q.map(q=>q.y))];
-  A.innerHTML=`<div class="card">
+  
+  // 組合公告 HTML (如果 SYSTEM_NOTICE 有內容才顯示)
+  let noticeHTML = "";
+  if (SYSTEM_NOTICE.trim() !== "") {
+    noticeHTML = `
+      <div class="sys-notice">
+        <div class="sys-notice-icon">📢</div>
+        <div class="sys-notice-content">${SYSTEM_NOTICE}</div>
+      </div>
+    `;
+  }
+
+  A.innerHTML=`${noticeHTML}
+  <div class="card">
     <h2>學測國文刷題</h2>
     <p class="meta">
       <span>題庫 ${Q.length} 題｜作答 ${s.t}，答對 ${s.c}（${s.t?Math.round(s.c/s.t*100):0}%）｜錯題 ${Object.keys(s.w).length}</span>
@@ -228,14 +278,12 @@ function home(){
   </div>`;
 }
 
-// [僅修改了 HTML 的結構，加上 div.card]
 function start(m,v){
   const s=S();list=Q.filter(q=>m=="all"||(m=="y"&&q.y==v)||(m=="w"&&s.w[id(q)]));
   if(!list.length){alert("沒有題目");return}
   list.sort(()=>Math.random()-.5);i=0;show();
 }
 
-// [修改了 HTML 結構，加上卡片與進度條樣式]
 function show(){
   const q=list[i];picks=new Set();done=false;
   A.innerHTML=`<div class="card">
@@ -256,7 +304,6 @@ function pick(k){
   document.getElementById("o"+k).classList.toggle("sel");
 }
 
-// [修改了回饋區塊的 HTML，加上 .feedback class]
 function submit(){
   if(done||!picks.size)return;done=true;
   const q=list[i],p=[...picks].sort().map(k=>L[k]).join(""),ok=p==q.a,s=S();
