@@ -89,14 +89,14 @@
     max-width: 640px;
     margin: 0 auto;
     padding: 20px;
-    padding-top: 60px; /* 留空間給右上角的按鈕 */
+    padding-top: 80px; /* 留空間給右上角的按鈕 */
   }
 
   /* 右上角切換模式按鈕 */
   .theme-toggle {
     position: fixed;
-    top: 16px;
-    right: 16px;
+    top: 24px;
+    right: 24px;
     z-index: 999;
     background: var(--card);
     border: 1px solid var(--bd);
@@ -341,9 +341,9 @@ function toggleTheme() {
 // 更新按鈕圖示
 function updateThemeIcon(theme) {
   if (theme === 'dark') {
-    themeToggleBtn.textContent = '☀️'; // 深色模式時顯示太陽(點擊變亮)
+    themeToggleBtn.textContent = '深色模式'; // 深色模式時顯示太陽(點擊變亮)
   } else {
-    themeToggleBtn.textContent = '🌙'; // 淺色模式時顯示月亮(點擊變暗)
+    themeToggleBtn.textContent = '淺色模式'; // 淺色模式時顯示月亮(點擊變暗)
   }
 }
 
