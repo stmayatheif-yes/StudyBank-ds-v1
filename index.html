@@ -19,7 +19,7 @@
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --radius: 12px;
     
-    /* 新增：公告區塊專用顏色 */
+    /* 公告區塊專用顏色 */
     --notice-bg: #eff6ff;
     --notice-bd: #bfdbfe;
     --notice-fg: #1e3a8a;
@@ -37,7 +37,7 @@
       --ac-hover: #3b82f6;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
       
-      /* 新增：公告區塊深色模式顏色 */
+      /* 公告區塊深色模式顏色 */
       --notice-bg: #1e3a8a33;
       --notice-bd: #1e40af;
       --notice-fg: #bfdbfe;
@@ -69,7 +69,7 @@
     border: 1px solid var(--bd);
   }
 
-  /* 新增：系統公告樣式 */
+  /* 系統公告樣式 */
   .sys-notice {
     background: var(--notice-bg);
     border: 1px solid var(--notice-bd);
@@ -82,7 +82,7 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    white-space: pre-wrap; /* 讓換行符號生效 */
+    white-space: pre-wrap;
   }
   .sys-notice-icon {
     font-size: 1.2rem;
@@ -92,10 +92,76 @@
     flex: 1;
   }
 
-  h2 {
+  /* 標題列與版本按鈕 */
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .header-row h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .btn-version {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    margin: 0;
+    background: var(--bg);
+    border-color: var(--bd);
+    color: var(--fg);
+    opacity: 0.8;
+  }
+  .btn-version:hover {
+    opacity: 1;
+    border-color: var(--ac);
+    color: var(--ac);
+  }
+
+  /* 彈出視窗 (Modal) 樣式 */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal-content {
+    background: var(--card);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 90%;
+    width: 400px;
+    transform: translateY(20px);
+    transition: all 0.2s ease;
+    border: 1px solid var(--bd);
+    white-space: pre-wrap;
+    line-height: 1.8;
+  }
+  .modal-overlay.active .modal-content {
+    transform: translateY(0);
+  }
+  .modal-content h3 {
     margin-top: 0;
     margin-bottom: 16px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--bd);
+    padding-bottom: 10px;
+  }
+  .modal-close {
+    width: 100%;
+    margin-top: 20px;
   }
 
   p {
@@ -225,14 +291,24 @@
 <body>
 <main id="app">載入中…</main>
 
+<!-- 彈出視窗 (預設隱藏) -->
+<div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>📋 版本內容</h3>
+    <div>
+      ★當前版本：V1.0.0<br>
+      ★版本內容：新增110~115學測歷屆試題<br>
+      ★更新時間：11/08 01:30
+    </div>
+    <button class="go modal-close" onclick="closeVersionModal()">關閉</button>
+  </div>
+</div>
+
 <script>
 // ==========================================
 // 🌟 系統公告設定區 🌟
-// 如果要更改公告，只要修改這裡的文字即可。
-// 若留空字串 ""，就不會顯示公告。
-// 可以用 \n 來換行。
 // ==========================================
-const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+const SYSTEM_NOTICE = "📢 歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
 
 // 若要同步到 Google Sheet，把 Apps Script 網頁應用程式網址貼在這裡（留空＝只存本機）
 const SYNC_URL="";
@@ -244,10 +320,20 @@ const save=s=>{try{localStorage.setItem("qb",JSON.stringify(s))}catch(e){}};
 const L="ABCDE";
 Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
 
+// 開啟與關閉版本彈窗的函數
+function openVersionModal() {
+  document.getElementById('versionModal').classList.add('active');
+}
+function closeVersionModal(e) {
+  // 如果點擊的是遮罩背景，或者點擊關閉按鈕，才關閉
+  if (!e || e.target === document.getElementById('versionModal') || e.target.tagName === 'BUTTON') {
+    document.getElementById('versionModal').classList.remove('active');
+  }
+}
+
 function home(){
   const s=S(),ys=[...new Set(Q.map(q=>q.y))];
   
-  // 組合公告 HTML (如果 SYSTEM_NOTICE 有內容才顯示)
   let noticeHTML = "";
   if (SYSTEM_NOTICE.trim() !== "") {
     noticeHTML = `
@@ -260,7 +346,10 @@ function home(){
 
   A.innerHTML=`${noticeHTML}
   <div class="card">
-    <h2>學測國文刷題</h2>
+    <div class="header-row">
+      <h2>學測國文刷題</h2>
+      <button class="btn-version" onclick="openVersionModal()">版本內容</button>
+    </div>
     <p class="meta">
       <span>題庫 ${Q.length} 題｜作答 ${s.t}，答對 ${s.c}（${s.t?Math.round(s.c/s.t*100):0}%）｜錯題 ${Object.keys(s.w).length}</span>
     </p>
