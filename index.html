@@ -162,44 +162,77 @@
   .modal-content {
     background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow);
     max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease;
-    border: 1px solid var(--bd); white-space: pre-wrap; line-height: 1.8;
-    position: relative; /* 為了讓內部按鈕好定位 */
+    border: 1px solid var(--bd); line-height: 1.8;
+    position: relative;
   }
   .modal-overlay.active .modal-content { transform: translateY(0); }
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; }
   
-  /* 歷史版本列表樣式 */
-  .history-list {
-    margin-top: 10px;
-    padding-left: 10px;
-    border-left: 2px solid var(--bd);
-    font-size: 0.95rem;
+  /* ==========================================
+     修改：橫向時間軸樣式
+     ========================================== */
+  .history-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 20px 0 10px 0;
+    scroll-behavior: smooth;
+    /* 隱藏滾動條但保留功能 (針對不同瀏覽器) */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
-  .history-item { margin-bottom: 12px; }
-  .history-item strong { color: var(--ac); display: block; margin-bottom: 2px; }
+  .history-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
 
-  /* Modal 按鈕區塊 */
-  .modal-actions {
+  .history-item-horizontal {
+    flex: 0 0 200px; /* 固定卡片寬度，不壓縮 */
+    background: var(--bg);
+    border: 1px solid var(--bd);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 24px;
+  }
+
+  /* 版本上方的小圓點 */
+  .history-item-horizontal::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ac);
+  }
+
+  .history-item-horizontal strong {
+    color: var(--ac);
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  
+  .history-date {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-bottom: 8px;
+  }
+
+  .history-desc {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .modal-actions {
+    display: flex; flex-direction: column; gap: 8px; margin-top: 24px;
   }
   .btn-secondary {
-    background: var(--bg);
-    color: var(--fg);
-    border: 1px solid var(--bd);
-    font-weight: normal;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
+    background: var(--bg); color: var(--fg); border: 1px solid var(--bd); font-weight: normal;
+    padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: center;
   }
-  .btn-secondary:hover {
-    background: color-mix(in srgb, var(--ac) 10%, var(--card));
-    border-color: var(--ac);
-  }
+  .btn-secondary:hover { background: color-mix(in srgb, var(--ac) 10%, var(--card)); border-color: var(--ac); }
 
   p { margin-top: 0; margin-bottom: 16px; }
 
@@ -252,37 +285,26 @@
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
-    <div>
-      ★當前版本：V1.3.0<br>
-      ★版本內容：新增歷來版本一覽功能。<br>
-      ★更新時間：11/08 02:30
+    <div id="currentVersionContent">
+      <!-- JavaScript 會自動把最新版本填入這裡 -->
     </div>
     <div class="modal-actions">
-      <!-- 點擊此按鈕切換到歷史版本 -->
       <button class="btn-secondary" onclick="switchModal('versionModal', 'historyModal')">歷來版本一覽</button>
       <button class="go" onclick="closeVersionModal()">關閉</button>
     </div>
   </div>
 </div>
 
-<!-- 彈出視窗 2：歷來版本一覽 -->
+<!-- 彈出視窗 2：歷來版本一覽 (橫向) -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>📜 歷來版本</h3>
-    <div class="history-list">
-      <div class="history-item">
-        <strong>v1.2.0</strong>
-        新增深色模式/淺色模式切換功能。
-      </div>
-      <div class="history-item">
-        <strong>v1.1.0</strong>
-        新增公告與版本內容功能。
-      </div>
-      <div class="history-item">
-        <strong>v1.0.0</strong>
-        新增110~115歷屆試題。
-      </div>
+    <h3>📜 歷來版本 (可左右滑動)</h3>
+    
+    <!-- 橫向滑動容器 -->
+    <div class="history-scroll-container" id="historyList">
+      <!-- JavaScript 會自動把版本卡片填入這裡 -->
     </div>
+
     <div class="modal-actions">
       <button class="go" onclick="closeVersionModal()">關閉</button>
     </div>
@@ -290,6 +312,44 @@
 </div>
 
 <script>
+// ==========================================
+// 🌟 版本紀錄設定區 (以後只需改這裡！)
+// ==========================================
+// 規則：把最新的版本放在「最上面」
+const VERSION_HISTORY = [
+  { version: "v1.3.0", desc: "新增歷來版本一覽功能。", date: "11/08 02:30" },
+  { version: "v1.2.0", desc: "新增深色模式/淺色模式切換功能。", date: "11/08 02:00" },
+  { version: "v1.1.0", desc: "新增公告與版本內容功能。", date: "11/08 01:30" },
+  { version: "v1.0.0", desc: "新增110~115歷屆試題。", date: "11/08 01:00" }
+];
+
+// 頁面載入時，自動生成版本內容
+function renderVersions() {
+  const current = VERSION_HISTORY[0]; // 抓取陣列第一筆（最新版）
+  
+  // 渲染「當前版本」
+  document.getElementById('currentVersionContent').innerHTML = `
+    ★當前版本：${current.version}<br>
+    ★版本內容：${current.desc}<br>
+    ★更新時間：${current.date}
+  `;
+
+  // 渲染「歷來版本一覽」 (橫向卡片)
+  let historyHTML = "";
+  VERSION_HISTORY.forEach(item => {
+    historyHTML += `
+      <div class="history-item-horizontal">
+        <strong>${item.version}</strong>
+        <div class="history-date">${item.date}</div>
+        <div class="history-desc">${item.desc}</div>
+      </div>
+    `;
+  });
+  document.getElementById('historyList').innerHTML = historyHTML;
+}
+// 執行渲染
+renderVersions();
+
 // ==========================================
 // 🌓 深淺色模式切換邏輯
 // ==========================================
@@ -334,7 +394,7 @@ initTheme();
 // ==========================================
 // 🌟 系統設定與公告
 // ==========================================
-const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+const SYSTEM_NOTICE = "📢 歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 const A=document.getElementById("app");
@@ -345,22 +405,13 @@ const L="ABCDE";
 
 Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
 
-// ==========================================
-// 📋 彈出視窗邏輯 (包含切換功能)
-// ==========================================
-function openVersionModal() { 
-  document.getElementById('versionModal').classList.add('active'); 
-}
-
-// 關閉所有彈窗
+function openVersionModal() { document.getElementById('versionModal').classList.add('active'); }
 function closeVersionModal(e) {
   if (!e || e.target.classList.contains('modal-overlay') || e.target.tagName === 'BUTTON') {
     document.getElementById('versionModal').classList.remove('active');
     document.getElementById('historyModal').classList.remove('active');
   }
 }
-
-// 切換不同的彈窗
 function switchModal(closeId, openId) {
   document.getElementById(closeId).classList.remove('active');
   document.getElementById(openId).classList.add('active');
