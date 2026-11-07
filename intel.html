@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>學測國文刷題</title>
+<style>
+  /* 顏色變數設定 (支援亮暗色模式) */
+  :root {
+    color-scheme: light dark;
+    --bg: #f0f2f5;
+    --fg: #1a1a1a;
+    --card: #ffffff;
+    --bd: #e0e0e0;
+    --ok: #10b981;
+    --no: #ef4444;
+    --ac: #3b82f6;
+    --ac-hover: #2563eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius: 12px;
+  }
+  
+  @media(prefers-color-scheme: dark) {
+    :root {
+      --bg: #111827;
+      --fg: #f3f4f6;
+      --card: #1f2937;
+      --bd: #374151;
+      --ok: #34d399;
+      --no: #f87171;
+      --ac: #60a5fa;
+      --ac-hover: #3b82f6;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* 基礎設定 */
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.6 system-ui, -apple-system, "Noto Sans TC", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* 卡片容器 (套用在題目、首頁) */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    border: 1px solid var(--bd);
+  }
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  /* 按鈕與下拉選單基礎樣式 */
+  button, select {
+    font: inherit;
+    color: inherit;
+    background: var(--card);
+    border: 1px solid var(--bd);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 4px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  button:hover, select:hover {
+    border-color: var(--ac);
+    transform: translateY(-1px);
+  }
+  
+  button:active {
+    transform: translateY(1px);
+  }
+
+  select {
+    appearance: none;
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+
+  /* 題目選項按鈕 (滿版) */
+  .opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: var(--bg);
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    box-shadow: none; /* 移除選項陰影，保持簡潔 */
+  }
+
+  .opt:hover {
+    background: color-mix(in srgb, var(--ac) 8%, var(--card));
+    border-color: var(--ac);
+  }
+
+  /* 選中狀態 */
+  .sel {
+    border-color: var(--ac) !important;
+    background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important;
+    outline: 2px solid var(--ac);
+    outline-offset: -2px;
+  }
+
+  /* 答對狀態 */
+  .ok {
+    border-color: var(--ok) !important;
+    background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important;
+    color: var(--ok);
+  }
+
+  /* 答錯狀態 */
+  .no {
+    border-color: var(--no) !important;
+    background: color-mix(in srgb, var(--no) 15%, var(--card)) !important;
+    color: var(--no);
+  }
+
+  /* 主要行動按鈕 (送出、下一題、開始) */
+  .go {
+    background: var(--ac);
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent);
+  }
+
+  .go:hover {
+    background: var(--ac-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent);
+  }
+
+  /* 次要文字 (統計資訊、作答進度) */
+  .meta {
+    color: var(--fg);
+    opacity: 0.6;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--bd);
+  }
+
+  .meta button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  /* 解答回饋區塊 */
+  .feedback {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--bg);
+    border-left: 4px solid var(--ac);
+  }
+</style>
+</head>
+<body>
+<main id="app">載入中…</main>
+
+<script>
+// 若要同步到 Google Sheet，把 Apps Script 網頁應用程式網址貼在這裡（留空＝只存本機）
+const SYNC_URL="";
+let Q=[],list=[],i=0,picks=new Set(),done=false;
+const A=document.getElementById("app");
+const id=q=>q.y+"-"+q.n;
+const S=()=>{try{return JSON.parse(localStorage.getItem("qb"))||{w:{},c:0,t:0}}catch(e){return{w:{},c:0,t:0}}};
+const save=s=>{try{localStorage.setItem("qb",JSON.stringify(s))}catch(e){}};
+const L="ABCDE";
+Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
+
+// [僅修改了 HTML 的結構，加上 div.card 使其變成卡片]
+function home(){
+  const s=S(),ys=[...new Set(Q.map(q=>q.y))];
+  A.innerHTML=`<div class="card">
+    <h2>學測國文刷題</h2>
+    <p class="meta">
+      <span>題庫 ${Q.length} 題｜作答 ${s.t}，答對 ${s.c}（${s.t?Math.round(s.c/s.t*100):0}%）｜錯題 ${Object.keys(s.w).length}</span>
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <button class="go" onclick="start('all')">🎲 隨機刷題</button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <select id="yr" style="flex: 1;">${ys.map(y=>`<option value="${y}">${y} 年</option>`)}</select>
+        <button onclick="start('y',yr.value)" style="flex: 1;">依年度</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="start('w')" style="flex: 1;">📝 只刷錯題</button>
+        <button onclick="if(confirm('清除紀錄？')){save({w:{},c:0,t:0});home()}" style="flex: 1; color: var(--no);">🗑️ 清除紀錄</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// [僅修改了 HTML 的結構，加上 div.card]
+function start(m,v){
+  const s=S();list=Q.filter(q=>m=="all"||(m=="y"&&q.y==v)||(m=="w"&&s.w[id(q)]));
+  if(!list.length){alert("沒有題目");return}
+  list.sort(()=>Math.random()-.5);i=0;show();
+}
+
+// [修改了 HTML 結構，加上卡片與進度條樣式]
+function show(){
+  const q=list[i];picks=new Set();done=false;
+  A.innerHTML=`<div class="card">
+    <p class="meta">
+      <span>第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
+      <button onclick="home()">結束</button>
+    </p>
+    <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
+    q.o.map((t,k)=>`<button class="opt" id="o${k}" onclick="pick(${k})">(${L[k]}) ${t}</button>`).join("")+
+    `<div id="f"><button class="go" onclick="submit()">送出答案</button></div>
+  </div>`;
+}
+
+function pick(k){
+  if(done)return;const q=list[i];
+  if(q.a.length==1){picks=new Set([k]);submit();return}
+  picks.has(k)?picks.delete(k):picks.add(k);
+  document.getElementById("o"+k).classList.toggle("sel");
+}
+
+// [修改了回饋區塊的 HTML，加上 .feedback class]
+function submit(){
+  if(done||!picks.size)return;done=true;
+  const q=list[i],p=[...picks].sort().map(k=>L[k]).join(""),ok=p==q.a,s=S();
+  s.t++;if(ok){s.c++;delete s.w[id(q)]}else s.w[id(q)]=1;save(s);
+  
+  q.o.forEach((_,k)=>{
+    const b=document.getElementById("o"+k);
+    b.classList.remove("sel");
+    if(q.a.includes(L[k]))b.classList.add("ok");
+    else if(picks.has(k))b.classList.add("no");
+  });
+  
+  document.getElementById("f").innerHTML=`
+    <div class="feedback" style="border-left-color: ${ok ? 'var(--ok)' : 'var(--no)'}">
+      <p style="margin: 0 0 12px 0; font-weight: bold; color: ${ok ? 'var(--ok)' : 'var(--no)'}">
+        ${ok ? "✅ 答對了！" : "❌ 答錯了"}
+      </p>
+      <p style="margin: 0 0 16px 0; font-size: 0.95rem;">正確答案：<strong>${q.a}</strong></p>
+      <button class="go" onclick="next()">${i+1<list.length?"下一題 ➔":"完成並回首頁"}</button>
+    </div>`;
+    
+  if(SYNC_URL)fetch(SYNC_URL,{method:"POST",mode:"no-cors",body:JSON.stringify({user:localStorage.getItem("uid")||(localStorage.uid=Math.random().toString(36).slice(2)),id:id(q),ok:ok,pick:p})}).catch(()=>{});
+}
+
+function next(){i++;i<list.length?show():home()}
+</script>
+</body>
+</html>
