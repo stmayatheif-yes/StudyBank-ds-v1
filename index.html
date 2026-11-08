@@ -69,14 +69,25 @@
     background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.2s ease; cursor: pointer;
+    gap: 6px; /* 圖標與文字的間距 */
   }
   .btn-icon:hover { opacity: 1; border-color: var(--ac); color: var(--ac); transform: translateY(-1px); }
   
   /* 🌟 最終定案：極細線條的圖標 */
   .btn-icon svg { 
-    width: 20px; 
-    height: 20px; 
+    width: 16px; 
+    height: 16px; 
     stroke-width: 1.5; 
+  }
+
+  /* 🌟 新增：搜尋按鈕專屬文字顏色偏暗 */
+  .search-btn-text {
+    color: var(--fg);
+    opacity: 0.6; /* 調暗文字 */
+  }
+  .btn-icon:hover .search-btn-text {
+    opacity: 1; /* hover時恢復亮度 */
+    color: var(--ac);
   }
 
   /* 彈出視窗共用樣式 */
@@ -218,7 +229,7 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區 (合併 1.8.2~1.8.4)
+// 🌟 版本紀錄設定區 (維持 1.8.2)
 // ==========================================
 const VERSION_HISTORY = [
   { version: "v1.8.2", desc: "優化搜尋圖標顯示。", date: "11/08 23:35" },
@@ -514,12 +525,13 @@ function home(){
       <h2>學測國文刷題</h2>
       <button class="btn-icon" onclick="openVersionModal()" title="版本內容">版本內容</button>
       
-      <!-- 🌟 最終定案：極細線條的圖標 -->
+      <!-- 🌟 搜尋按鈕：圖標 + 文字，文字顏色調暗 -->
       <button class="btn-icon" onclick="openSearchModal()" title="搜尋題目">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="10" cy="10" r="7"></circle>
           <line x1="21" y1="21" x2="15" y2="15"></line>
         </svg>
+        <span class="search-btn-text">搜尋題目</span>
       </button>
       
     </div>
