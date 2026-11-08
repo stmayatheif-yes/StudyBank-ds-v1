@@ -141,9 +141,10 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區 (維持 1.4.0)
+// 🌟 版本紀錄設定區
 // ==========================================
 const VERSION_HISTORY = [
+  { version: "v1.5.0", desc: "新增上一題功能與優化部份文字顯示。", date: "11/08 15:30" },
   { version: "v1.4.0", desc: "優化介面顯示錯誤與刷題邏輯。", date: "11/08 13:50" },
   { version: "v1.3.0", desc: "新增歷來版本一覽功能。", date: "11/08 02:30" },
   { version: "v1.2.0", desc: "新增深色模式/淺色模式切換功能。", date: "11/08 02:00" },
@@ -300,8 +301,7 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 🌟 這次用三段式排版：
-  // 左邊（第X題） - 中間（上一題） - 右邊（結束）
+  // 最終定案的排版：左邊題號 + 上一題，右邊結束
   A.innerHTML=`<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
       
