@@ -112,7 +112,6 @@
   .btn-next { background: var(--ac); color: #fff; border: none; padding: 14px; width: 100%; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); cursor: pointer; transition: all 0.2s ease; }
   .btn-next:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
-  /* 針對題型練習的單選/多選按鈕 */
   .type-select-btn { display: block; width: 100%; text-align: center; padding: 16px; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; border: 2px solid var(--bd); background: var(--bg); cursor: pointer; border-radius: 10px; transition: 0.2s; }
   .type-select-btn:hover { border-color: var(--ac); color: var(--ac); }
   .type-select-btn.selected { border-color: var(--ac); background: color-mix(in srgb, var(--ac) 15%, var(--card)); color: var(--ac); }
@@ -124,7 +123,6 @@
 
 <main id="app"></main>
 
-<!-- 彈出視窗 1：版本內容 -->
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
@@ -136,7 +134,6 @@
   </div>
 </div>
 
-<!-- 彈出視窗 2：歷來版本 -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📜 歷來版本(可滑動)</h3>
@@ -147,33 +144,47 @@
   </div>
 </div>
 
-<!-- 彈出視窗 3：針對題型練習 -->
 <div id="typeModal" class="modal-overlay" onclick="closeTypeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>🎯 針對題型練習</h3>
-    
     <p style="margin-bottom: 8px; font-weight: bold;">1. 選擇題型：</p>
     <button class="type-select-btn" id="btnTypeSingle" onclick="selectType('single')">單選題</button>
     <button class="type-select-btn" id="btnTypeMulti" onclick="selectType('multi')">多選題</button>
-
     <p style="margin-bottom: 8px; margin-top: 24px; font-weight: bold;">2. 選擇順序：</p>
     <div class="modal-actions" style="margin-top: 0;">
       <button class="btn-secondary" onclick="startTypePractice('shuffle')">🎲 打亂題號順序</button>
       <button class="btn-secondary" onclick="startTypePractice('sort')">📑 按照年份題號</button>
     </div>
-    
     <div class="modal-actions" style="margin-top: 16px;">
       <button class="go" style="background: var(--bd); color: var(--fg); box-shadow: none;" onclick="closeTypeModal()">取消</button>
     </div>
   </div>
 </div>
 
+<!-- 彈出視窗 4：完成測驗報告 -->
+<div id="reportModal" class="modal-overlay" onclick="closeReportModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>📊 測驗結果</h3>
+    <p style="font-size: 1.1rem; line-height: 2;">
+      本次測驗完成！<br>
+      總題數：<strong>${''}</strong><br>
+      答對題數：<strong>${''}</strong><br>
+      正確率：<strong>${''}</strong>
+    </p>
+    <div class="modal-actions">
+      <button class="go" style="background: var(--ok);" onclick="sendEmailReport()">✉️ 寄送答題紀錄至信箱</button>
+      <button class="go" onclick="closeReportModal(); home()">回首頁</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區 (更新為 1.6.0)
+// 🌟 版本紀錄設定區 (更新為 1.7.0)
 // ==========================================
 const VERSION_HISTORY = [
-  { version: "v1.6.0", desc: "新增針對題型練習功能。", date: "11/08 16:20" },
+  { version: "v1.7.0", desc: "新增寄送答題紀錄功能。", date: "11/08 16:10" },
+  { version: "v1.6.0", desc: "新增針對題型練習功能。", date: "11/08 15:50" },
   { version: "v1.5.0", desc: "新增上一題功能與優化部份文字顯示。", date: "11/08 15:30" },
   { version: "v1.4.0", desc: "優化介面顯示錯誤與刷題邏輯。", date: "11/08 13:50" },
   { version: "v1.3.0", desc: "新增歷來版本一覽功能。", date: "11/08 02:30" },
@@ -250,7 +261,10 @@ const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 
 let userAnswers = {}; 
-let selectedType = null; // 紀錄題型彈窗選了什麼 ('single' 或 'multi')
+let selectedType = null; 
+
+// 用來記錄這次測驗的成績，方便寄信
+let sessionStats = { total: 0, correct: 0 };
 
 const A=document.getElementById("app");
 const id=q=>q.y+"-"+q.n;
@@ -272,9 +286,6 @@ function switchModal(closeId, openId) {
   document.getElementById(openId).classList.add('active');
 }
 
-// ==========================================
-// 🎯 針對題型練習邏輯
-// ==========================================
 function openTypeModal() {
   selectedType = null;
   document.getElementById('btnTypeSingle').classList.remove('selected');
@@ -302,7 +313,6 @@ function startTypePractice(order) {
   
   closeTypeModal();
 
-  // 篩選題型：長度 > 1 為多選，長度 == 1 為單選
   list = Q.filter(q => {
     if (selectedType === 'multi') return q.a.length > 1;
     if (selectedType === 'single') return q.a.length === 1;
@@ -314,11 +324,9 @@ function startTypePractice(order) {
     return;
   }
 
-  // 排序邏輯
   if (order === 'shuffle') {
     list.sort(() => Math.random() - 0.5);
   } else if (order === 'sort') {
-    // 先按年份排，再按題號排
     list.sort((a, b) => {
       if (a.y !== b.y) return a.y - b.y;
       return parseInt(a.n) - parseInt(b.n);
@@ -327,12 +335,10 @@ function startTypePractice(order) {
 
   i = 0;
   userAnswers = {};
+  sessionStats = { total: list.length, correct: 0 }; // 重置本次成績
   show();
 }
 
-// ==========================================
-// 📝 刷題主邏輯
-// ==========================================
 function home(){
   const ys = [...new Set(Q.map(q=>q.y))].sort((a,b) => a - b);
   const s=S();
@@ -384,6 +390,7 @@ function start(m,v){
   }
   i=0;
   userAnswers = {}; 
+  sessionStats = { total: list.length, correct: 0 };
   show();
 }
 
@@ -392,18 +399,12 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 最終定案的排版
   A.innerHTML=`<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
-      
       <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; font-size: 0.9rem;">第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
-      
       <button onclick="prev()" ${i===0?'disabled':''} style="padding: 4px 10px; font-size: 0.8rem; margin: 0 8px; flex-shrink: 0;">上一題</button>
-      
       <button onclick="home()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0; flex-shrink: 0;">結束</button>
-      
     </div>
-    
     <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
     q.o.map((t,k)=>{
       let cls = "opt";
@@ -413,9 +414,7 @@ function show(){
       } else if (picks.has(k)) {
         cls += " sel";
       }
-
       let cleanText = t.replace(/^\([A-E]\)\s*/, '').replace(/^[A-E][\.\、]\s*/, '');
-
       return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${cleanText}</button>`;
     }).join("")+
     `<div id="f">${done ? generateFeedback(q) : `<button class="go" onclick="submit()">送出答案</button>`}</div>
@@ -426,7 +425,9 @@ function generateFeedback(q){
   const p = userAnswers[id(q)] ? [...userAnswers[id(q)]].sort().map(k=>L[k]).join("") : "";
   const ok = p == q.a;
   
-  let btnNext = `<button class="btn-next" onclick="next()">${i+1<list.length?"下一題":"完成並回首頁"}</button>`;
+  // 如果是這一題組的最後一題，按鈕顯示「看結果」
+  let isLast = (i === list.length - 1);
+  let btnNext = `<button class="btn-next" onclick="${isLast ? 'showReport()' : 'next()'}">${isLast ? "📊 看測驗結果" : "下一題"}</button>`;
 
   return `
     <div class="feedback" style="border-left-color: ${ok ? 'var(--ok)' : 'var(--no)'}">
@@ -452,6 +453,9 @@ function submit(){
   
   userAnswers[id(q)] = [...picks];
   
+  // 記錄本次測驗成績
+  if(ok) sessionStats.correct++;
+
   s.t++;
   if(ok){s.c++;delete s.w[id(q)]}else s.w[id(q)]=1;
   save(s);
@@ -475,7 +479,51 @@ function prev(){
 
 function next(){ 
   i++; 
-  i<list.length?show():home(); 
+  i<list.length?show():showReport(); // 如果到最後一題，直接叫出報告
+}
+
+// ==========================================
+// 📊 結算報告與寄信功能
+// ==========================================
+function showReport() {
+  const rate = sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0;
+  
+  document.getElementById('reportModal').innerHTML = `
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3>📊 測驗結果</h3>
+      <div style="text-align: center; margin: 30px 0;">
+        <div style="font-size: 3rem; font-weight: bold; color: var(--ac); margin-bottom: 10px;">${rate}%</div>
+        <p style="font-size: 1.1rem; margin: 0;">總題數：<strong>${sessionStats.total}</strong> 題</p>
+        <p style="font-size: 1.1rem; margin: 0;">答對題數：<strong>${sessionStats.correct}</strong> 題</p>
+      </div>
+      <div class="modal-actions">
+        <button class="go" style="background: var(--ok);" onclick="sendEmailReport()">✉️ 寄送答題紀錄</button>
+        <button class="go" style="background: var(--bd); color: var(--fg); box-shadow: none;" onclick="closeReportModal(); home()">回首頁</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('reportModal').classList.add('active');
+}
+
+function closeReportModal(e) {
+  if (!e || e.target.classList.contains('modal-overlay') || e.target.tagName === 'BUTTON') {
+    document.getElementById('reportModal').classList.remove('active');
+  }
+}
+
+function sendEmailReport() {
+  const rate = sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0;
+  const dateStr = new Date().toLocaleString('zh-TW');
+  
+  // 準備郵件內容 (使用 \n 換行)
+  const subject = `【學測國文刷題】答題紀錄 - ${dateStr}`;
+  const body = `這是一封來自「學測國文刷題系統」的答題紀錄。\n\n測驗時間：${dateStr}\n本次作答題數：${sessionStats.total} 題\n答對題數：${sessionStats.correct} 題\n正確率：${rate}%\n\n繼續加油！祝你考試順利！`;
+
+  // 使用 mailto 連結打開使用者的預設信箱
+  const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+  // 開啟信箱
+  window.location.href = mailtoLink;
 }
 </script>
 </body>
