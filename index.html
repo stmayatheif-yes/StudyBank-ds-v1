@@ -9,249 +9,110 @@
 <meta property="og:description" content="收錄 110-115 學測國文歷屆選擇題。提供隨機刷題、依年度練習、錯題複習與深淺色模式。">
 
 <style>
-  /* 顏色變數設定：加入 html[data-theme] 來強制切換 */
+  /* 顏色變數設定 */
   :root {
     color-scheme: light dark;
-    --bg: #f0f2f5;
-    --fg: #1a1a1a;
-    --card: #ffffff;
-    --bd: #e0e0e0;
-    --ok: #10b981;
-    --no: #ef4444;
-    --ac: #3b82f6;
-    --ac-hover: #2563eb;
+    --bg: #f0f2f5; --fg: #1a1a1a; --card: #ffffff; --bd: #e0e0e0;
+    --ok: #10b981; --no: #ef4444; --ac: #3b82f6; --ac-hover: #2563eb;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --radius: 12px;
-    --notice-bg: #eff6ff;
-    --notice-bd: #bfdbfe;
-    --notice-fg: #1e3a8a;
+    --radius: 12px; --notice-bg: #eff6ff; --notice-bd: #bfdbfe; --notice-fg: #1e3a8a;
   }
-  
   @media(prefers-color-scheme: dark) {
     :root {
-      --bg: #111827;
-      --fg: #f3f4f6;
-      --card: #1f2937;
-      --bd: #374151;
-      --ok: #34d399;
-      --no: #f87171;
-      --ac: #60a5fa;
-      --ac-hover: #3b82f6;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-      --notice-bg: #1e3a8a33;
-      --notice-bd: #1e40af;
-      --notice-fg: #bfdbfe;
+      --bg: #111827; --fg: #f3f4f6; --card: #1f2937; --bd: #374151;
+      --ok: #34d399; --no: #f87171; --ac: #60a5fa; --ac-hover: #3b82f6;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); --notice-bg: #1e3a8a33; --notice-bd: #1e40af; --notice-fg: #bfdbfe;
     }
   }
-
   html[data-theme="light"] {
-    color-scheme: light;
-    --bg: #f0f2f5;
-    --fg: #1a1a1a;
-    --card: #ffffff;
-    --bd: #e0e0e0;
-    --ok: #10b981;
-    --no: #ef4444;
-    --ac: #3b82f6;
-    --ac-hover: #2563eb;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --notice-bg: #eff6ff;
-    --notice-bd: #bfdbfe;
-    --notice-fg: #1e3a8a;
+    color-scheme: light; --bg: #f0f2f5; --fg: #1a1a1a; --card: #ffffff; --bd: #e0e0e0;
+    --ok: #10b981; --no: #ef4444; --ac: #3b82f6; --ac-hover: #2563eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); --notice-bg: #eff6ff; --notice-bd: #bfdbfe; --notice-fg: #1e3a8a;
   }
   html[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #111827;
-    --fg: #f3f4f6;
-    --card: #1f2937;
-    --bd: #374151;
-    --ok: #34d399;
-    --no: #f87171;
-    --ac: #60a5fa;
-    --ac-hover: #3b82f6;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    --notice-bg: #1e3a8a33;
-    --notice-bd: #1e40af;
-    --notice-fg: #bfdbfe;
+    color-scheme: dark; --bg: #111827; --fg: #f3f4f6; --card: #1f2937; --bd: #374151;
+    --ok: #34d399; --no: #f87171; --ac: #60a5fa; --ac-hover: #3b82f6;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); --notice-bg: #1e3a8a33; --notice-bd: #1e40af; --notice-fg: #bfdbfe;
   }
 
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
+    margin: 0; background: var(--bg); color: var(--fg);
     font: 16px/1.6 system-ui, -apple-system, "Noto Sans TC", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased; transition: background 0.3s ease, color 0.3s ease;
   }
-  
-  main {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-top: 85px;
-  }
+  main { max-width: 640px; margin: 0 auto; padding: 20px; padding-top: 85px; }
 
   .theme-toggle {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 999;
-    background: var(--card);
-    border: 1px solid var(--bd);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    font-size: 0.65rem;
-    font-weight: 500;
-    line-height: 1.1;
-    color: var(--fg);
-    padding: 0;
-    margin: 0;
-    transition: all 0.2s ease;
+    position: fixed; top: 24px; right: 24px; z-index: 999; background: var(--card);
+    border: 1px solid var(--bd); border-radius: 50%; width: 44px; height: 44px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: var(--shadow); font-size: 0.65rem; font-weight: 500;
+    line-height: 1.1; color: var(--fg); padding: 0; margin: 0; transition: all 0.2s ease;
   }
   .theme-toggle:hover { transform: translateY(-2px); border-color: var(--ac); color: var(--ac); }
 
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    border: 1px solid var(--bd);
-    transition: background 0.3s ease, border-color 0.3s ease;
-  }
+  .card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid var(--bd); transition: background 0.3s ease, border-color 0.3s ease; }
 
   .sys-notice {
-    background: var(--notice-bg);
-    border: 1px solid var(--notice-bd);
-    color: var(--notice-fg);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-    box-shadow: var(--shadow);
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    white-space: pre-wrap;
+    background: var(--notice-bg); border: 1px solid var(--notice-bd); color: var(--notice-fg);
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; font-size: 0.95rem;
+    box-shadow: var(--shadow); display: flex; gap: 12px; align-items: flex-start; white-space: pre-wrap;
   }
   .sys-notice-icon { font-size: 1.2rem; line-height: 1.2; }
   .sys-notice-content { flex: 1; }
 
   .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
   .header-row h2 { margin: 0; font-size: 1.5rem; }
-  .btn-version {
-    padding: 4px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0;
-    background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8;
-  }
+  .btn-version { padding: 4px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0; background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8; }
   .btn-version:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
 
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
-    z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease;
-  }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
   .modal-overlay.active { opacity: 1; visibility: visible; }
-  .modal-content {
-    background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow);
-    max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease;
-    border: 1px solid var(--bd); line-height: 1.8;
-    position: relative;
-  }
+  .modal-content { background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease; border: 1px solid var(--bd); line-height: 1.8; position: relative; }
   .modal-overlay.active .modal-content { transform: translateY(0); }
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; }
   
-  .history-scroll-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 16px;
-    padding: 20px 0 10px 0;
-    scroll-behavior: smooth;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .history-scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 20px 0 10px 0; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
   .history-scroll-container::-webkit-scrollbar { display: none; }
-
-  .history-item-horizontal {
-    flex: 0 0 200px;
-    background: var(--bg);
-    border: 1px solid var(--bd);
-    border-radius: 10px;
-    padding: 16px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-  .history-item-horizontal::before {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: 20px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--bd);
-  }
-  .history-item-horizontal.latest::before {
-    background: var(--ac);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 30%, transparent);
-  }
+  .history-item-horizontal { flex: 0 0 200px; background: var(--bg); border: 1px solid var(--bd); border-radius: 10px; padding: 16px; position: relative; display: flex; flex-direction: column; }
+  .history-item-horizontal::before { content: ''; position: absolute; top: -6px; left: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--bd); }
+  .history-item-horizontal.latest::before { background: var(--ac); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 30%, transparent); }
   .history-item-horizontal strong { color: var(--ac); font-size: 1rem; margin-bottom: 4px; }
   .history-date { font-size: 0.75rem; opacity: 0.6; margin-bottom: 8px; }
   .history-desc { font-size: 0.9rem; line-height: 1.4; }
 
   .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
-  .btn-secondary {
-    background: var(--bg); color: var(--fg); border: 1px solid var(--bd); font-weight: normal;
-    padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: center;
-  }
+  .btn-secondary { background: var(--bg); color: var(--fg); border: 1px solid var(--bd); font-weight: normal; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
   .btn-secondary:hover { background: color-mix(in srgb, var(--ac) 10%, var(--card)); border-color: var(--ac); }
 
   p { margin-top: 0; margin-bottom: 16px; }
 
-  button, select {
-    font: inherit; color: inherit; background: var(--card);
-    border: 1px solid var(--bd); border-radius: 8px; padding: 10px 16px; margin: 4px 0;
-    cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  }
-  button:hover, select:hover { border-color: var(--ac); transform: translateY(-1px); }
-  button:active { transform: translateY(1px); }
-  select {
-    appearance: none; padding-right: 32px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-  }
+  button, select { font: inherit; color: inherit; background: var(--card); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 16px; margin: 4px 0; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  button:hover:not(:disabled), select:hover { border-color: var(--ac); transform: translateY(-1px); }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  select { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
 
-  .opt {
-    display: block; width: 100%; text-align: left; padding: 16px; margin-bottom: 12px;
-    border-radius: 10px; background: var(--bg); line-height: 1.5; letter-spacing: 0.5px; box-shadow: none;
-  }
-  .opt:hover { background: color-mix(in srgb, var(--ac) 8%, var(--card)); border-color: var(--ac); }
-  .sel {
-    border-color: var(--ac) !important; background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important;
-    outline: 2px solid var(--ac); outline-offset: -2px;
-  }
+  .opt { display: block; width: 100%; text-align: left; padding: 16px; margin-bottom: 12px; border-radius: 10px; background: var(--bg); line-height: 1.5; letter-spacing: 0.5px; box-shadow: none; }
+  .opt:hover:not(.ok):not(.no):not(:disabled) { background: color-mix(in srgb, var(--ac) 8%, var(--card)); border-color: var(--ac); }
+  .opt:disabled { cursor: default; }
+  .sel { border-color: var(--ac) !important; background: color-mix(in srgb, var(--ac) 15%, var(--card)) !important; outline: 2px solid var(--ac); outline-offset: -2px; }
   .ok { border-color: var(--ok) !important; background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important; color: var(--ok); }
   .no { border-color: var(--no) !important; background: color-mix(in srgb, var(--no) 15%, var(--card)) !important; color: var(--no); }
 
-  .go {
-    background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%;
-    padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent);
-  }
-  .go:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
+  .go { background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); }
+  .go:hover:not(:disabled) { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
-  .meta {
-    color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);
-  }
+  .meta { color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd); }
   .meta button { padding: 6px 12px; font-size: 0.85rem; margin: 0; }
   .feedback { margin-top: 20px; padding: 16px; border-radius: 8px; background: var(--bg); border-left: 4px solid var(--ac); }
+
+  .action-group { display: flex; gap: 10px; margin-top: 12px; }
+  .btn-nav { flex: 1; padding: 14px; font-weight: bold; border-radius: 10px; text-align: center; border: none; color: #fff; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-prev { background: var(--bd); color: var(--fg); }
+  .btn-prev:hover:not(:disabled) { background: color-mix(in srgb, var(--bd) 80%, var(--fg)); }
+  .btn-next { background: var(--ac); box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); }
+  .btn-next:hover:not(:disabled) { background: var(--ac-hover); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 </style>
 </head>
 <body>
@@ -273,7 +134,7 @@
 
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>📜 歷來版本 (左至右：舊到新)</h3>
+    <h3>📜 歷來版本(可滑動)</h3>
     <div class="history-scroll-container" id="historyList"></div>
     <div class="modal-actions">
       <button class="go" onclick="closeVersionModal()">關閉</button>
@@ -283,7 +144,7 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區
+// 🌟 版本紀錄設定區 (維持 1.4.0)
 // ==========================================
 const VERSION_HISTORY = [
   { version: "v1.4.0", desc: "優化介面顯示錯誤與刷題邏輯。", date: "11/08 13:50" },
@@ -318,7 +179,7 @@ function renderVersions() {
 renderVersions();
 
 // ==========================================
-// 🌓 深淺色模式切換邏輯
+// 🌓 深淺色模式
 // ==========================================
 const themeToggleBtn = document.getElementById('themeToggle');
 
@@ -356,16 +217,20 @@ initTheme();
 // ==========================================
 // 🌟 系統設定與公告
 // ==========================================
-const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如神！";
+const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 110-115 學年度學測國文選擇題。\n祝大家考試順利，答題如有神！";
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
+
+// 用來記錄這次測驗中，已經作答過的題目狀態
+let userAnswers = {}; 
+
 const A=document.getElementById("app");
 const id=q=>q.y+"-"+q.n;
 const S=()=>{try{return JSON.parse(localStorage.getItem("qb"))||{w:{},c:0,t:0}}catch(e){return{w:{},c:0,t:0}}};
 const save=s=>{try{localStorage.setItem("qb",JSON.stringify(s))}catch(e){}};
 const L="ABCDE";
 
-Promise.all(["questions.json","q2.json","q3.json","q4.json","q5.json","q6.json","q7.json","q8.json","q9.json","q10.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀不到 questions.json（請用 GitHub Pages 開啟）");
+Promise.all(["./questions.json","./q2.json","./q3.json","./q4.json","./q5.json","./q6.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀取失敗，請確認題庫已上傳");
 
 function openVersionModal() { document.getElementById('versionModal').classList.add('active'); }
 function closeVersionModal(e) {
@@ -383,9 +248,7 @@ function switchModal(closeId, openId) {
 // 📝 刷題主邏輯
 // ==========================================
 function home(){
-  // 🌟 新增：將年份抓出來後，自動由小到大排序（保證不管怎麼上傳，選單永遠是 110 -> 115）
   const ys = [...new Set(Q.map(q=>q.y))].sort((a,b) => a - b);
-  
   const s=S();
   let noticeHTML = "";
   if (SYSTEM_NOTICE.trim() !== "") {
@@ -432,20 +295,58 @@ function start(m,v){
     list.sort((a, b) => parseInt(a.n) - parseInt(b.n));
   }
   i=0;
+  userAnswers = {}; // 重置當次作答紀錄
   show();
 }
 
 function show(){
-  const q=list[i];picks=new Set();done=false;
+  const q=list[i];
+  
+  // 載入這題是否已經作答過
+  picks = new Set(userAnswers[id(q)] || []);
+  done = userAnswers[id(q)] !== undefined;
+
   A.innerHTML=`<div class="card">
     <p class="meta">
       <span>第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
       <button onclick="home()">結束</button>
     </p>
+    
     <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
-    q.o.map((t,k)=>`<button class="opt" id="o${k}" onclick="pick(${k})">(${L[k]}) ${t}</button>`).join("")+
-    `<div id="f"><button class="go" onclick="submit()">送出答案</button></div>
+    q.o.map((t,k)=>{
+      let cls = "opt";
+      if (done) {
+        if (q.a.includes(L[k])) cls += " ok";
+        else if (picks.has(k)) cls += " no";
+      } else if (picks.has(k)) {
+        cls += " sel";
+      }
+      // 如果已經作答 (done)，就加入 disabled 屬性，防止修改
+      return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${t}</button>`;
+    }).join("")+
+    `<div id="f">${done ? generateFeedback(q) : `<button class="go" onclick="submit()">送出答案</button>`}</div>
   </div>`;
+}
+
+// 產生解答回饋區塊與導覽按鈕
+function generateFeedback(q){
+  const p = userAnswers[id(q)] ? [...userAnswers[id(q)]].sort().map(k=>L[k]).join("") : "";
+  const ok = p == q.a;
+  
+  let btnPrev = `<button class="btn-nav btn-prev" onclick="prev()" ${i===0?'disabled':''}>⬅️ 上一題</button>`;
+  let btnNext = `<button class="btn-nav btn-next" onclick="next()">${i+1<list.length?"下一題 ➡️":"完成並回首頁"}</button>`;
+
+  return `
+    <div class="feedback" style="border-left-color: ${ok ? 'var(--ok)' : 'var(--no)'}">
+      <p style="margin: 0 0 12px 0; font-weight: bold; color: ${ok ? 'var(--ok)' : 'var(--no)'}">
+        ${ok ? "✅ 答對了！" : "❌ 答錯了"}
+      </p>
+      <p style="margin: 0 0 16px 0; font-size: 0.95rem;">正確答案：<strong>${q.a}</strong></p>
+      <div class="action-group">
+        ${btnPrev}
+        ${btnNext}
+      </div>
+    </div>`;
 }
 
 function pick(k){
@@ -456,30 +357,39 @@ function pick(k){
 }
 
 function submit(){
-  if(done||!picks.size)return;done=true;
+  if(done||!picks.size)return;
+  done=true;
   const q=list[i],p=[...picks].sort().map(k=>L[k]).join(""),ok=p==q.a,s=S();
-  s.t++;if(ok){s.c++;delete s.w[id(q)]}else s.w[id(q)]=1;save(s);
   
+  // 紀錄作答，並在重新渲染時鎖定
+  userAnswers[id(q)] = [...picks];
+  
+  s.t++;
+  if(ok){s.c++;delete s.w[id(q)]}else s.w[id(q)]=1;
+  save(s);
+  
+  // 更新按鈕顏色，並鎖定
   q.o.forEach((_,k)=>{
     const b=document.getElementById("o"+k);
     b.classList.remove("sel");
     if(q.a.includes(L[k]))b.classList.add("ok");
     else if(picks.has(k))b.classList.add("no");
+    b.disabled = true; // 🌟 關鍵：送出後禁用按鈕
   });
   
-  document.getElementById("f").innerHTML=`
-    <div class="feedback" style="border-left-color: ${ok ? 'var(--ok)' : 'var(--no)'}">
-      <p style="margin: 0 0 12px 0; font-weight: bold; color: ${ok ? 'var(--ok)' : 'var(--no)'}">
-        ${ok ? "✅ 答對了！" : "❌ 答錯了"}
-      </p>
-      <p style="margin: 0 0 16px 0; font-size: 0.95rem;">正確答案：<strong>${q.a}</strong></p>
-      <button class="go" onclick="next()">${i+1<list.length?"下一題 ➔":"完成並回首頁"}</button>
-    </div>`;
+  document.getElementById("f").innerHTML = generateFeedback(q);
     
   if(SYNC_URL)fetch(SYNC_URL,{method:"POST",mode:"no-cors",body:JSON.stringify({user:localStorage.getItem("uid")||(localStorage.uid=Math.random().toString(36).slice(2)),id:id(q),ok:ok,pick:p})}).catch(()=>{});
 }
 
-function next(){i++;i<list.length?show():home()}
+function prev(){ 
+  if(i>0){ i--; show(); }
+}
+
+function next(){ 
+  i++; 
+  i<list.length?show():home(); 
+}
 </script>
 </body>
 </html>
