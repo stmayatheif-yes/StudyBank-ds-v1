@@ -272,7 +272,7 @@ function home(){
         <button onclick="start('y',yr.value)" style="flex: 1;">依年度</button>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button onclick="start('w')" style="flex: 1;">📝 只刷錯題</button>
+        <button onclick="start('w')" style="flex: 1;">📝 錯題本</button>
         <button onclick="if(confirm('清除紀錄？')){save({w:{},c:0,t:0});home()}" style="flex: 1; color: var(--no);">🗑️ 清除紀錄</button>
       </div>
     </div>
@@ -300,17 +300,15 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 🌟 完美對齊：使用 flex 並且不要包群組，讓元素自然對齊
+  // 🌟 這次用三段式排版：
+  // 左邊（第X題） - 中間（上一題） - 右邊（結束）
   A.innerHTML=`<div class="card">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
       
-      <!-- 題號 (靠左) -->
-      <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; font-size: 0.9rem; margin-right: 10px;">第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
+      <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; font-size: 0.9rem;">第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
       
-      <!-- 上一題 (靠右) -->
-      <button onclick="prev()" ${i===0?'disabled':''} style="padding: 4px 10px; font-size: 0.8rem; margin: 0 8px 0 0; flex-shrink: 0;">上一題</button>
+      <button onclick="prev()" ${i===0?'disabled':''} style="padding: 4px 10px; font-size: 0.8rem; margin: 0 8px; flex-shrink: 0;">上一題</button>
       
-      <!-- 結束 (靠最右邊的紅框處) -->
       <button onclick="home()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0; flex-shrink: 0;">結束</button>
       
     </div>
