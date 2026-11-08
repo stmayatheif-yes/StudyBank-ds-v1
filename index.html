@@ -121,6 +121,21 @@
   .type-select-btn { display: block; width: 100%; text-align: center; padding: 16px; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; border: 2px solid var(--bd); background: var(--bg); cursor: pointer; border-radius: 10px; transition: 0.2s; }
   .type-select-btn:hover { border-color: var(--ac); color: var(--ac); }
   .type-select-btn.selected { border-color: var(--ac); background: color-mix(in srgb, var(--ac) 15%, var(--card)); color: var(--ac); }
+
+  /* 🌟 新增：搜尋結果清單樣式 */
+  .search-result-item {
+    display: block; width: 100%; text-align: left; background: var(--bg);
+    border: 1px solid var(--bd); border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease;
+    font-size: 0.95rem; line-height: 1.5; box-shadow: none;
+  }
+  .search-result-item:hover {
+    border-color: var(--ac); background: color-mix(in srgb, var(--ac) 8%, var(--card));
+  }
+  .search-result-meta {
+    font-size: 0.8rem; color: var(--ac); font-weight: bold; margin-bottom: 4px; display: block;
+  }
+  .highlight { color: #ef4444; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -150,17 +165,22 @@
   </div>
 </div>
 
-<!-- 搜尋彈出視窗 -->
+<!-- 🌟 修改：搜尋彈出視窗，加大以顯示清單 -->
 <div id="searchModal" class="modal-overlay" onclick="closeSearchModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
+  <div class="modal-content" onclick="event.stopPropagation()" style="width: 500px; max-height: 80vh; overflow-y: auto;">
     <h3>🔍 題目搜尋</h3>
-    <p style="font-size: 0.9rem; opacity: 0.8;">輸入關鍵字（例如：成語、注音、特定課文），系統會尋找題目或選項中包含該字詞的題目。</p>
     <div style="display: flex; gap: 8px; margin-top: 16px;">
       <input type="text" id="searchInput" placeholder="請輸入關鍵字..." style="flex: 1; margin: 0;" onkeypress="if(event.key === 'Enter') searchQuestions()">
       <button onclick="searchQuestions()" style="margin: 0; background: var(--ac); color: #fff; border: none;">搜尋</button>
     </div>
+    
+    <!-- 搜尋結果顯示區 -->
+    <div id="searchResultsContainer" style="margin-top: 20px;">
+      <!-- 結果會動態插入這裡 -->
+    </div>
+
     <div class="modal-actions" style="margin-top: 24px;">
-      <button class="go" style="background: var(--bd); color: var(--fg); box-shadow: none;" onclick="closeSearchModal()">取消</button>
+      <button class="go" style="background: var(--bd); color: var(--fg); box-shadow: none;" onclick="closeSearchModal()">關閉</button>
     </div>
   </div>
 </div>
@@ -193,7 +213,7 @@
 // 🌟 版本紀錄設定區 (更新為 1.8.1)
 // ==========================================
 const VERSION_HISTORY = [
-  { version: "v1.8.1", desc: "優化題目搜尋介面為彈出視窗。", date: "11/08 21:50" },
+  { version: "v1.8.1", desc: "優化題目搜尋介面與結果顯示。", date: "11/08 21:50" },
   { version: "v1.8.0", desc: "新增題目關鍵字搜尋功能。", date: "11/08 21:45" },
   { version: "v1.7.0", desc: "新增寄送答題紀錄功能。", date: "11/08 16:10" },
   { version: "v1.6.0", desc: "新增針對題型練習功能。", date: "11/08 15:50" },
@@ -275,6 +295,7 @@ let Q=[],list=[],i=0,picks=new Set(),done=false;
 let userAnswers = {}; 
 let selectedType = null; 
 let sessionStats = { total: 0, correct: 0 };
+let currentSearchResults = []; // 🌟 暫存搜尋結果
 
 const A=document.getElementById("app");
 const id=q=>q.y+"-"+q.n;
@@ -297,10 +318,11 @@ function switchModal(closeId, openId) {
 }
 
 // ==========================================
-// 🔍 搜尋彈窗與邏輯
+// 🔍 搜尋彈窗與邏輯 (全新優化)
 // ==========================================
 function openSearchModal() {
   document.getElementById('searchInput').value = '';
+  document.getElementById('searchResultsContainer').innerHTML = ''; // 清空上次結果
   document.getElementById('searchModal').classList.add('active');
   setTimeout(() => document.getElementById('searchInput').focus(), 100);
 }
@@ -311,6 +333,20 @@ function closeSearchModal(e) {
   }
 }
 
+// 避免 HTML 標籤衝突的跳脫函數
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
+
+// 將關鍵字包上紅字標籤
+function highlightKeyword(text, kw) {
+  if (!kw) return escapeHTML(text);
+  const regex = new RegExp(`(${kw})`, 'gi');
+  return escapeHTML(text).replace(regex, '<span class="highlight">$1</span>');
+}
+
 function searchQuestions() {
   const keyword = document.getElementById('searchInput').value.trim();
   if (!keyword) {
@@ -319,22 +355,61 @@ function searchQuestions() {
   }
 
   const kw = keyword.toLowerCase();
-  list = Q.filter(q => {
+  currentSearchResults = Q.filter(q => {
     return q.q.toLowerCase().includes(kw) || q.o.some(opt => opt.toLowerCase().includes(kw));
   });
 
-  if (!list.length) {
-    alert(`找不到包含「${keyword}」的題目。`);
+  const container = document.getElementById('searchResultsContainer');
+  
+  if (!currentSearchResults.length) {
+    container.innerHTML = `<p style="text-align: center; color: var(--no); margin-top: 20px;">找不到包含「${escapeHTML(keyword)}」的題目 😢</p>`;
     return;
   }
 
-  list.sort((a, b) => {
+  // 依照年份與題號排序
+  currentSearchResults.sort((a, b) => {
     if (a.y !== b.y) return a.y - b.y;
     return parseInt(a.n) - parseInt(b.n);
   });
 
+  let html = `<p style="font-size: 0.9rem; margin-bottom: 12px;">找到 <strong>${currentSearchResults.length}</strong> 筆結果：</p>`;
+  
+  currentSearchResults.forEach((q, index) => {
+    // 抓取題目文字
+    let textToShow = q.q;
+    
+    // 如果題目太長，擷取包含關鍵字的片段 (大約取前後 30 個字)
+    const matchIndex = textToShow.toLowerCase().indexOf(kw);
+    if (matchIndex > 40) {
+      textToShow = "..." + textToShow.substring(matchIndex - 30, matchIndex + 40) + "...";
+    } else if (textToShow.length > 70) {
+      textToShow = textToShow.substring(0, 70) + "...";
+    }
+
+    const highlightedText = highlightKeyword(textToShow, keyword);
+    const typeStr = q.a.length > 1 ? "[多選]" : "[單選]";
+
+    html += `
+      <button class="search-result-item" onclick="startFromSearch(${index})">
+        <span class="search-result-meta">${q.y} 學測國綜${typeStr}第${q.n}題</span>
+        <span>${highlightedText}</span>
+      </button>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// 點擊搜尋結果後，進入刷題模式
+function startFromSearch(index) {
   closeSearchModal();
-  i = 0;
+  
+  // 把搜尋結果當作這次的刷題清單
+  list = [...currentSearchResults]; 
+  
+  // 點擊哪一題，就從哪一題開始
+  i = index; 
+  
   userAnswers = {};
   sessionStats = { total: list.length, correct: 0 };
   show();
