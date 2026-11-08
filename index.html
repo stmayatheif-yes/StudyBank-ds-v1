@@ -6,7 +6,7 @@
 <title>學測國文刷題</title>
 
 <meta property="og:title" content="學測國文刷題系統">
-<meta property="og:description" content="收錄 110-116 學測國文歷屆選擇題。提供隨機刷題、依年度練習、錯題複習與深淺色模式。">
+<meta property="og:description" content="收錄 110-115 學測國文歷屆選擇題。提供隨機刷題、依年度練習、錯題複習與深淺色模式。">
 
 <style>
   /* 顏色變數設定：加入 html[data-theme] 來強制切換 */
@@ -88,10 +88,9 @@
     max-width: 640px;
     margin: 0 auto;
     padding: 20px;
-    padding-top: 85px; /* 留給右上角按鈕的空間 */
+    padding-top: 85px;
   }
 
-  /* 右上角深淺色切換按鈕 (小圓形 + 縮小文字) */
   .theme-toggle {
     position: fixed;
     top: 24px;
@@ -153,7 +152,6 @@
   }
   .btn-version:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
 
-  /* 彈出視窗 (Modal) 樣式 */
   .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
@@ -169,7 +167,6 @@
   .modal-overlay.active .modal-content { transform: translateY(0); }
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; }
   
-  /* 橫向時間軸樣式 */
   .history-scroll-container {
     display: flex;
     overflow-x: auto;
@@ -191,8 +188,6 @@
     display: flex;
     flex-direction: column;
   }
-  
-  /* 時間軸圓點 */
   .history-item-horizontal::before {
     content: '';
     position: absolute;
@@ -203,19 +198,15 @@
     border-radius: 50%;
     background: var(--bd);
   }
-  /* 最新版本的圓點發光 */
   .history-item-horizontal.latest::before {
     background: var(--ac);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 30%, transparent);
   }
-
   .history-item-horizontal strong { color: var(--ac); font-size: 1rem; margin-bottom: 4px; }
   .history-date { font-size: 0.75rem; opacity: 0.6; margin-bottom: 8px; }
   .history-desc { font-size: 0.9rem; line-height: 1.4; }
 
-  .modal-actions {
-    display: flex; flex-direction: column; gap: 8px; margin-top: 24px;
-  }
+  .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
   .btn-secondary {
     background: var(--bg); color: var(--fg); border: 1px solid var(--bd); font-weight: normal;
     padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: center;
@@ -269,13 +260,10 @@
 
 <main id="app"></main>
 
-<!-- 彈出視窗 1：當前版本內容 -->
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
-    <div id="currentVersionContent">
-      <!-- JavaScript 會自動把最新版本填入這裡 -->
-    </div>
+    <div id="currentVersionContent"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="switchModal('versionModal', 'historyModal')">歷來版本一覽</button>
       <button class="go" onclick="closeVersionModal()">關閉</button>
@@ -283,16 +271,10 @@
   </div>
 </div>
 
-<!-- 彈出視窗 2：歷來版本一覽 (橫向) -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📜 歷來版本 (左至右：舊到新)</h3>
-    
-    <!-- 橫向滑動容器 -->
-    <div class="history-scroll-container" id="historyList">
-      <!-- JavaScript 會自動把版本卡片填入這裡 -->
-    </div>
-
+    <div class="history-scroll-container" id="historyList"></div>
     <div class="modal-actions">
       <button class="go" onclick="closeVersionModal()">關閉</button>
     </div>
@@ -301,9 +283,8 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區 (以後只需改這裡！)
+// 🌟 版本紀錄設定區
 // ==========================================
-// 規則：把最新的版本放在「最上面」
 const VERSION_HISTORY = [
   { version: "v1.4.0", desc: "優化介面顯示錯誤與刷題邏輯。", date: "11/08 13:50" },
   { version: "v1.3.0", desc: "新增歷來版本一覽功能。", date: "11/08 02:30" },
@@ -312,24 +293,17 @@ const VERSION_HISTORY = [
   { version: "v1.0.0", desc: "新增110~115歷屆試題。", date: "11/08 01:00" }
 ];
 
-// 頁面載入時，自動生成版本內容
 function renderVersions() {
-  const current = VERSION_HISTORY[0]; // 抓取陣列第一筆（最新版）
-  
-  // 渲染「當前版本」
+  const current = VERSION_HISTORY[0];
   document.getElementById('currentVersionContent').innerHTML = `
     ★當前版本：${current.version}<br>
     ★版本內容：${current.desc}<br>
     ★更新時間：${current.date}
   `;
 
-  // 🌟 渲染「歷來版本一覽」 (橫向卡片，左到右：最舊 -> 最新)
   let historyHTML = "";
-  // 使用 [...VERSION_HISTORY].reverse() 來反轉陣列，讓最舊的排在最左邊
   const sortedHistory = [...VERSION_HISTORY].reverse(); 
-  
   sortedHistory.forEach((item, index) => {
-    // 判斷是否為最新版（反轉後的最後一個），給予發光特效
     const isLatest = index === sortedHistory.length - 1; 
     historyHTML += `
       <div class="history-item-horizontal ${isLatest ? 'latest' : ''}">
@@ -341,7 +315,6 @@ function renderVersions() {
   });
   document.getElementById('historyList').innerHTML = historyHTML;
 }
-// 執行渲染
 renderVersions();
 
 // ==========================================
@@ -369,20 +342,15 @@ function toggleTheme() {
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     newTheme = isDark ? 'light' : 'dark';
   }
-
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
   updateThemeText(newTheme);
 }
 
 function updateThemeText(theme) {
-  if (theme === 'dark') {
-    themeToggleBtn.innerHTML = '淺色<br>模式';
-  } else {
-    themeToggleBtn.innerHTML = '深色<br>模式';
-  }
+  if (theme === 'dark') { themeToggleBtn.innerHTML = '淺色<br>模式'; } 
+  else { themeToggleBtn.innerHTML = '深色<br>模式'; }
 }
-
 initTheme();
 
 // ==========================================
@@ -415,7 +383,10 @@ function switchModal(closeId, openId) {
 // 📝 刷題主邏輯
 // ==========================================
 function home(){
-  const s=S(),ys=[...new Set(Q.map(q=>q.y))];
+  // 🌟 新增：將年份抓出來後，自動由小到大排序（保證不管怎麼上傳，選單永遠是 110 -> 115）
+  const ys = [...new Set(Q.map(q=>q.y))].sort((a,b) => a - b);
+  
+  const s=S();
   let noticeHTML = "";
   if (SYSTEM_NOTICE.trim() !== "") {
     noticeHTML = `
@@ -451,20 +422,15 @@ function home(){
 
 function start(m,v){
   const s=S();
-  // 篩選出符合條件的題目
   list=Q.filter(q=>m=="all"||(m=="y"&&q.y==v)||(m=="w"&&s.w[id(q)]));
   
   if(!list.length){alert("沒有題目");return}
   
-  // 🌟 只有「隨機刷題(m=="all")」或「只刷錯題(m=="w")」時才打亂順序
-  // 如果是指定年度(m=="y")，就保持原本的題號順序 (1, 2, 3...)
   if (m === "all" || m === "w") {
     list.sort(()=>Math.random() - 0.5);
   } else if (m === "y") {
-    // 確保依年度時，是依照題號（n）由小到大排序
     list.sort((a, b) => parseInt(a.n) - parseInt(b.n));
   }
-
   i=0;
   show();
 }
