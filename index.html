@@ -66,6 +66,7 @@
   .btn-version { padding: 4px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0; background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8; }
   .btn-version:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
 
+  /* 彈出視窗共用樣式 */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
   .modal-overlay.active { opacity: 1; visibility: visible; }
   .modal-content { background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease; border: 1px solid var(--bd); line-height: 1.8; position: relative; }
@@ -110,6 +111,11 @@
 
   .btn-next { background: var(--ac); color: #fff; border: none; padding: 14px; width: 100%; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); cursor: pointer; transition: all 0.2s ease; }
   .btn-next:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
+
+  /* 針對題型練習的單選/多選按鈕 */
+  .type-select-btn { display: block; width: 100%; text-align: center; padding: 16px; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; border: 2px solid var(--bd); background: var(--bg); cursor: pointer; border-radius: 10px; transition: 0.2s; }
+  .type-select-btn:hover { border-color: var(--ac); color: var(--ac); }
+  .type-select-btn.selected { border-color: var(--ac); background: color-mix(in srgb, var(--ac) 15%, var(--card)); color: var(--ac); }
 </style>
 </head>
 <body>
@@ -118,6 +124,7 @@
 
 <main id="app"></main>
 
+<!-- 彈出視窗 1：版本內容 -->
 <div id="versionModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📋 版本內容</h3>
@@ -129,6 +136,7 @@
   </div>
 </div>
 
+<!-- 彈出視窗 2：歷來版本 -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>📜 歷來版本(可滑動)</h3>
@@ -139,11 +147,33 @@
   </div>
 </div>
 
+<!-- 彈出視窗 3：針對題型練習 -->
+<div id="typeModal" class="modal-overlay" onclick="closeTypeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>🎯 針對題型練習</h3>
+    
+    <p style="margin-bottom: 8px; font-weight: bold;">1. 選擇題型：</p>
+    <button class="type-select-btn" id="btnTypeSingle" onclick="selectType('single')">單選題</button>
+    <button class="type-select-btn" id="btnTypeMulti" onclick="selectType('multi')">多選題</button>
+
+    <p style="margin-bottom: 8px; margin-top: 24px; font-weight: bold;">2. 選擇順序：</p>
+    <div class="modal-actions" style="margin-top: 0;">
+      <button class="btn-secondary" onclick="startTypePractice('shuffle')">🎲 打亂題號順序</button>
+      <button class="btn-secondary" onclick="startTypePractice('sort')">📑 按照年份題號</button>
+    </div>
+    
+    <div class="modal-actions" style="margin-top: 16px;">
+      <button class="go" style="background: var(--bd); color: var(--fg); box-shadow: none;" onclick="closeTypeModal()">取消</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區
+// 🌟 版本紀錄設定區 (更新為 1.6.0)
 // ==========================================
 const VERSION_HISTORY = [
+  { version: "v1.6.0", desc: "新增針對題型練習功能。", date: "11/08 15:50" },
   { version: "v1.5.0", desc: "新增上一題功能與優化部份文字顯示。", date: "11/08 15:30" },
   { version: "v1.4.0", desc: "優化介面顯示錯誤與刷題邏輯。", date: "11/08 13:50" },
   { version: "v1.3.0", desc: "新增歷來版本一覽功能。", date: "11/08 02:30" },
@@ -220,6 +250,7 @@ const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 
 let userAnswers = {}; 
+let selectedType = null; // 紀錄題型彈窗選了什麼 ('single' 或 'multi')
 
 const A=document.getElementById("app");
 const id=q=>q.y+"-"+q.n;
@@ -239,6 +270,64 @@ function closeVersionModal(e) {
 function switchModal(closeId, openId) {
   document.getElementById(closeId).classList.remove('active');
   document.getElementById(openId).classList.add('active');
+}
+
+// ==========================================
+// 🎯 針對題型練習邏輯
+// ==========================================
+function openTypeModal() {
+  selectedType = null;
+  document.getElementById('btnTypeSingle').classList.remove('selected');
+  document.getElementById('btnTypeMulti').classList.remove('selected');
+  document.getElementById('typeModal').classList.add('active');
+}
+
+function closeTypeModal(e) {
+  if (!e || e.target.classList.contains('modal-overlay') || e.target.tagName === 'BUTTON') {
+    document.getElementById('typeModal').classList.remove('active');
+  }
+}
+
+function selectType(type) {
+  selectedType = type;
+  document.getElementById('btnTypeSingle').classList.toggle('selected', type === 'single');
+  document.getElementById('btnTypeMulti').classList.toggle('selected', type === 'multi');
+}
+
+function startTypePractice(order) {
+  if (!selectedType) {
+    alert("請先選擇「單選」或「多選」喔！");
+    return;
+  }
+  
+  closeTypeModal();
+
+  // 篩選題型：長度 > 1 為多選，長度 == 1 為單選
+  list = Q.filter(q => {
+    if (selectedType === 'multi') return q.a.length > 1;
+    if (selectedType === 'single') return q.a.length === 1;
+    return false;
+  });
+
+  if (!list.length) {
+    alert("找不到該題型的題目！");
+    return;
+  }
+
+  // 排序邏輯
+  if (order === 'shuffle') {
+    list.sort(() => Math.random() - 0.5);
+  } else if (order === 'sort') {
+    // 先按年份排，再按題號排
+    list.sort((a, b) => {
+      if (a.y !== b.y) return a.y - b.y;
+      return parseInt(a.n) - parseInt(b.n);
+    });
+  }
+
+  i = 0;
+  userAnswers = {};
+  show();
 }
 
 // ==========================================
@@ -268,12 +357,14 @@ function home(){
     </p>
     <div style="display: flex; flex-direction: column; gap: 12px;">
       <button class="go" onclick="start('all')">🎲 隨機刷題</button>
+      <button class="go" onclick="openTypeModal()" style="background: var(--ok); box-shadow: 0 2px 4px color-mix(in srgb, var(--ok) 40%, transparent);">🎯 針對題型練習</button>
+      
       <div style="display: flex; gap: 8px; align-items: center;">
         <select id="yr" style="flex: 1;">${ys.map(y=>`<option value="${y}">${y} 年</option>`)}</select>
         <button onclick="start('y',yr.value)" style="flex: 1;">依年度</button>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button onclick="start('w')" style="flex: 1;">📝 錯題本</button>
+        <button onclick="start('w')" style="flex: 1;">📝 只刷錯題</button>
         <button onclick="if(confirm('清除紀錄？')){save({w:{},c:0,t:0});home()}" style="flex: 1; color: var(--no);">🗑️ 清除紀錄</button>
       </div>
     </div>
@@ -301,7 +392,7 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 最終定案的排版：左邊題號 + 上一題，右邊結束
+  // 最終定案的排版
   A.innerHTML=`<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
       
