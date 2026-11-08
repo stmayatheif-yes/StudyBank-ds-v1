@@ -319,7 +319,11 @@ function show(){
       } else if (picks.has(k)) {
         cls += " sel";
       }
-      return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${t}</button>`;
+
+      // 🌟 自動去除選項文字開頭重複的 (A)、(B) 等前綴
+      let cleanText = t.replace(/^\([A-E]\)\s*/, '').replace(/^[A-E][\.\、]\s*/, '');
+
+      return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${cleanText}</button>`;
     }).join("")+
     `<div id="f">${done ? generateFeedback(q) : `<button class="go" onclick="submit()">送出答案</button>`}</div>
   </div>`;
