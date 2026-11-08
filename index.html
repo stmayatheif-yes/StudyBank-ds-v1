@@ -77,7 +77,7 @@
   .search-btn-text { color: var(--fg); opacity: 0.6; }
   .btn-icon:hover .search-btn-text { opacity: 1; color: var(--ac); }
 
-  /* 通用 SVG 圖標樣式 (修正了這裡，避免圖標撐爆視窗) */
+  /* 通用 SVG 圖標樣式 */
   .svg-icon { width: 18px !important; height: 18px !important; stroke-width: 2; flex-shrink: 0; }
   .svg-icon-lg { width: 24px !important; height: 24px !important; stroke-width: 1.5; flex-shrink: 0; }
 
@@ -86,7 +86,6 @@
   .modal-content { background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 90%; width: 400px; transform: translateY(20px); transition: all 0.2s ease; border: 1px solid var(--bd); line-height: 1.8; position: relative; }
   .modal-overlay.active .modal-content { transform: translateY(0); }
   
-  /* 標題列改回原本的一般區塊排版，不要用 flex */
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   
   .history-scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 20px 0 10px 0; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
@@ -104,7 +103,6 @@
 
   p { margin-top: 0; margin-bottom: 16px; }
 
-  /* 修正全域按鈕排版，避免影響 modal */
   button, select, input { font: inherit; color: inherit; background: var(--card); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 16px; margin: 4px 0; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
   button:hover:not(:disabled), select:hover, input:focus { border-color: var(--ac); transform: translateY(-1px); }
   button:active:not(:disabled) { transform: translateY(1px); }
@@ -119,7 +117,6 @@
   .ok { border-color: var(--ok) !important; background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important; color: var(--ok); }
   .no { border-color: var(--no) !important; background: color-mix(in srgb, var(--no) 15%, var(--card)) !important; color: var(--no); }
 
-  /* 首頁主要按鈕專屬，使用 flex 置中圖文 */
   .go { background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); display: flex; align-items: center; justify-content: center; gap: 8px; }
   .go:hover:not(:disabled) { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
@@ -178,7 +175,7 @@
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
-      歷史版本
+      歷史版本 (沙漏)
     </h3>
     <div class="history-scroll-container" id="historyList"></div>
     <div class="modal-actions">
@@ -229,9 +226,10 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區 (維持 1.8.2)
+// 🌟 版本紀錄設定區 (更新為 1.9.0)
 // ==========================================
 const VERSION_HISTORY = [
+  { version: "v1.9.0", desc: "網站圖標煥新，取代emoji。", date: "11/09 00:35" },
   { version: "v1.8.2", desc: "優化搜尋圖標顯示。", date: "11/08 23:35" },
   { version: "v1.8.1", desc: "優化搜尋介面與結果顯示。", date: "11/08 21:50" },
   { version: "v1.8.0", desc: "新增題目搜尋功能。", date: "11/08 21:45" },
@@ -488,18 +486,19 @@ function home(){
     </p>
     <div style="display: flex; flex-direction: column; gap: 12px;">
       
-      <!-- 隨機刷題 (交叉洗牌圖標) -->
+      <!-- 隨機刷題 (標準洗牌 SVG) -->
       <button class="go" onclick="start('all')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
-          <polyline points="16 3 21 3 21 8" />
-          <line x1="4" y1="20" x2="21" y2="3" />
-          <polyline points="21 16 21 21 16 21" />
-          <path d="M15 15l6 6M4 4l5 5" />
+          <path d="M16 3h5v5"></path>
+          <path d="M4 20L21 3"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M15 15l6 6"></path>
+          <path d="M4 4l5 5"></path>
         </svg>
         隨機刷題
       </button>
 
-      <!-- 針對題型練習 (圖釘圖標) -->
+      <!-- 針對題型練習 (圖釘 SVG) -->
       <button class="go" onclick="openTypeModal()" style="background: var(--ok); box-shadow: 0 2px 4px color-mix(in srgb, var(--ok) 40%, transparent);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
           <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
