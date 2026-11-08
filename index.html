@@ -71,7 +71,13 @@
     transition: all 0.2s ease; cursor: pointer;
   }
   .btn-icon:hover { opacity: 1; border-color: var(--ac); color: var(--ac); transform: translateY(-1px); }
-  .btn-icon svg { width: 16px; height: 16px; }
+  
+  /* 🌟 最終定案：極細線條的圖標 */
+  .btn-icon svg { 
+    width: 20px; 
+    height: 20px; 
+    stroke-width: 1.5; 
+  }
 
   /* 彈出視窗共用樣式 */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
@@ -151,7 +157,7 @@
     <h3>📋 版本內容</h3>
     <div id="currentVersionContent"></div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="switchModal('versionModal', 'historyModal')">歷來版本一覽</button>
+      <button class="btn-secondary" onclick="switchModal('versionModal', 'historyModal')">歷史版本一覽</button>
       <button class="go" onclick="closeVersionModal()">關閉</button>
     </div>
   </div>
@@ -159,7 +165,7 @@
 
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <h3>📜 歷來版本(可滑動)</h3>
+    <h3>📜 歷史版本(可滑動)</h3>
     <div class="history-scroll-container" id="historyList"></div>
     <div class="modal-actions">
       <button class="go" onclick="closeVersionModal()">關閉</button>
@@ -170,7 +176,7 @@
 <!-- 搜尋彈出視窗 -->
 <div id="searchModal" class="modal-overlay" onclick="closeSearchModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()" style="width: 500px; max-height: 80vh; overflow-y: auto;">
-    <h3>題目搜尋</h3> <!-- 這裡的 Emoji 也拿掉了，看起來更俐落 -->
+    <h3>題目搜尋</h3>
     <div style="display: flex; gap: 8px; margin-top: 16px;">
       <input type="text" id="searchInput" placeholder="請輸入關鍵字..." style="flex: 1; margin: 0;" onkeypress="if(event.key === 'Enter') searchQuestions()">
       <button onclick="searchQuestions()" style="margin: 0; background: var(--ac); color: #fff; border: none;">搜尋</button>
@@ -212,12 +218,12 @@
 
 <script>
 // ==========================================
-// 🌟 版本紀錄設定區
+// 🌟 版本紀錄設定區 (合併 1.8.2~1.8.4)
 // ==========================================
 const VERSION_HISTORY = [
-  { version: "v1.8.2", desc: "優化搜尋圖標顯示。", date: "11/08 22:00" },
-  { version: "v1.8.1", desc: "優化題目搜尋介面與結果顯示。", date: "11/08 21:50" },
-  { version: "v1.8.0", desc: "新增題目關鍵字搜尋功能。", date: "11/08 21:45" },
+  { version: "v1.8.2", desc: "優化搜尋圖標顯示。", date: "11/08 23:35" },
+  { version: "v1.8.1", desc: "優化搜尋介面與結果顯示。", date: "11/08 21:50" },
+  { version: "v1.8.0", desc: "新增題目搜尋功能。", date: "11/08 21:45" },
   { version: "v1.7.0", desc: "新增寄送答題紀錄功能。", date: "11/08 16:10" },
   { version: "v1.6.0", desc: "新增針對題型練習功能。", date: "11/08 15:50" },
   { version: "v1.5.0", desc: "新增上一題功能與優化部份文字顯示。", date: "11/08 15:30" },
@@ -336,7 +342,6 @@ function closeSearchModal(e) {
   }
 }
 
-// 將所有全形標點符號轉為半形，以便進行統一比對
 function normalizeText(text) {
   const map = {
     '（': '(', '）': ')', '？': '?', '！': '!', '，': ',', '。': '.', '、': ',', 
@@ -345,19 +350,16 @@ function normalizeText(text) {
   return text.replace(/[（）？！」』，。、：；「『]/g, match => map[match] || match);
 }
 
-// 避免 HTML 標籤衝突的跳脫函數
 function escapeHTML(str) {
   return str.replace(/[&<>'"]/g, 
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
 }
 
-// 將正則表達式特殊字元跳脫
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
 }
 
-// 將關鍵字包上紅字標籤
 function highlightKeyword(text, kw) {
   if (!kw) return escapeHTML(text);
   const safeKw = escapeRegExp(kw);
@@ -512,11 +514,11 @@ function home(){
       <h2>學測國文刷題</h2>
       <button class="btn-icon" onclick="openVersionModal()" title="版本內容">版本內容</button>
       
-      <!-- 🌟 這裡把「搜尋」換成 SVG 放大鏡圖標 -->
+      <!-- 🌟 最終定案：極細線條的圖標 -->
       <button class="btn-icon" onclick="openSearchModal()" title="搜尋題目">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="7"></circle>
+          <line x1="21" y1="21" x2="15" y2="15"></line>
         </svg>
       </button>
       
