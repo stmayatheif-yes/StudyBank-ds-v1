@@ -65,11 +65,13 @@
   .header-row h2 { margin: 0; font-size: 1.5rem; margin-right: 4px; }
   
   .btn-icon { 
-    padding: 4px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0; 
+    padding: 6px 10px; font-size: 0.85rem; border-radius: 6px; margin: 0; 
     background: var(--bg); border-color: var(--bd); color: var(--fg); opacity: 0.8;
     display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; cursor: pointer;
   }
-  .btn-icon:hover { opacity: 1; border-color: var(--ac); color: var(--ac); }
+  .btn-icon:hover { opacity: 1; border-color: var(--ac); color: var(--ac); transform: translateY(-1px); }
+  .btn-icon svg { width: 16px; height: 16px; }
 
   /* 彈出視窗共用樣式 */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
@@ -168,7 +170,7 @@
 <!-- 搜尋彈出視窗 -->
 <div id="searchModal" class="modal-overlay" onclick="closeSearchModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()" style="width: 500px; max-height: 80vh; overflow-y: auto;">
-    <h3>🔍 題目搜尋</h3>
+    <h3>題目搜尋</h3> <!-- 這裡的 Emoji 也拿掉了，看起來更俐落 -->
     <div style="display: flex; gap: 8px; margin-top: 16px;">
       <input type="text" id="searchInput" placeholder="請輸入關鍵字..." style="flex: 1; margin: 0;" onkeypress="if(event.key === 'Enter') searchQuestions()">
       <button onclick="searchQuestions()" style="margin: 0; background: var(--ac); color: #fff; border: none;">搜尋</button>
@@ -213,6 +215,7 @@
 // 🌟 版本紀錄設定區
 // ==========================================
 const VERSION_HISTORY = [
+  { version: "v1.8.2", desc: "優化搜尋圖標顯示。", date: "11/08 22:00" },
   { version: "v1.8.1", desc: "優化題目搜尋介面與結果顯示。", date: "11/08 21:50" },
   { version: "v1.8.0", desc: "新增題目關鍵字搜尋功能。", date: "11/08 21:45" },
   { version: "v1.7.0", desc: "新增寄送答題紀錄功能。", date: "11/08 16:10" },
@@ -318,7 +321,7 @@ function switchModal(closeId, openId) {
 }
 
 // ==========================================
-// 🔍 搜尋彈窗與邏輯 (終極強化版)
+// 🔍 搜尋彈窗與邏輯
 // ==========================================
 function openSearchModal() {
   document.getElementById('searchInput').value = '';
@@ -369,15 +372,11 @@ function searchQuestions() {
     return;
   }
 
-  // 1. 將輸入的關鍵字正規化（例如輸入全形驚嘆號，會轉成半形）
   const normKeyword = normalizeText(rawKeyword).toLowerCase();
 
   currentSearchResults = Q.filter(q => {
-    // 2. 將題庫的題目與選項也正規化
     const normQText = normalizeText(q.q).toLowerCase();
     const normOText = q.o.map(opt => normalizeText(opt).toLowerCase()).join(" ");
-    
-    // 3. 進行比對
     return normQText.includes(normKeyword) || normOText.includes(normKeyword);
   });
 
@@ -388,7 +387,6 @@ function searchQuestions() {
     return;
   }
 
-  // 依照年份與題號排序
   currentSearchResults.sort((a, b) => {
     if (a.y !== b.y) return a.y - b.y;
     return parseInt(a.n) - parseInt(b.n);
@@ -398,8 +396,6 @@ function searchQuestions() {
   
   currentSearchResults.forEach((q, index) => {
     let textToShow = q.q;
-    
-    // 找出正規化後的字串在原文中的位置 (用於擷取段落)
     const normTextToShow = normalizeText(textToShow).toLowerCase();
     let matchIndex = normTextToShow.indexOf(normKeyword);
     
@@ -409,12 +405,10 @@ function searchQuestions() {
       textToShow = textToShow.substring(0, 70) + "...";
     }
 
-    // 處理高亮：因為使用者可能輸入全形或半形，我們用正規表達式把兩種都抓出來變紅字
     let highlightedText = escapeHTML(textToShow);
     const safeKw = escapeRegExp(rawKeyword);
     const safeKwNorm = escapeRegExp(normalizeText(rawKeyword));
     
-    // 建立一個能同時捕捉全形與半形的正則
     const regex = new RegExp(`(${safeKw}|${safeKwNorm})`, 'gi');
     highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
 
@@ -431,13 +425,10 @@ function searchQuestions() {
   container.innerHTML = html;
 }
 
-// 點擊搜尋結果後，進入刷題模式
 function startFromSearch(index) {
   closeSearchModal();
-  
   list = [...currentSearchResults]; 
   i = index; 
-  
   userAnswers = {};
   sessionStats = { total: list.length, correct: 0 };
   show();
@@ -520,7 +511,15 @@ function home(){
     <div class="header-row">
       <h2>學測國文刷題</h2>
       <button class="btn-icon" onclick="openVersionModal()" title="版本內容">版本內容</button>
-      <button class="btn-icon" onclick="openSearchModal()" title="搜尋題目">🔍</button>
+      
+      <!-- 🌟 這裡把「搜尋」換成 SVG 放大鏡圖標 -->
+      <button class="btn-icon" onclick="openSearchModal()" title="搜尋題目">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+      
     </div>
     <p class="meta">
       <span>題庫 ${Q.length} 題｜作答 ${s.t}，答對 ${s.c}（${s.t?Math.round(s.c/s.t*100):0}%）｜錯題 ${Object.keys(s.w).length}</span>
