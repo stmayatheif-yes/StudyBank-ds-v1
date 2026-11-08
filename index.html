@@ -87,6 +87,7 @@
 
   p { margin-top: 0; margin-bottom: 16px; }
 
+  /* 按鈕基礎樣式 */
   button, select { font: inherit; color: inherit; background: var(--card); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 16px; margin: 4px 0; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
   button:hover:not(:disabled), select:hover { border-color: var(--ac); transform: translateY(-1px); }
   button:active:not(:disabled) { transform: translateY(1px); }
@@ -103,16 +104,18 @@
   .go { background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); }
   .go:hover:not(:disabled) { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
+  /* meta 區塊排版 */
   .meta { color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd); }
   .meta button { padding: 6px 12px; font-size: 0.85rem; margin: 0; }
+  
+  /* 確保按鈕群組可以完美靠右對齊 */
+  .meta-actions { display: flex; gap: 8px; align-items: center; }
+
   .feedback { margin-top: 20px; padding: 16px; border-radius: 8px; background: var(--bg); border-left: 4px solid var(--ac); }
 
-  .action-group { display: flex; gap: 10px; margin-top: 12px; }
-  .btn-nav { flex: 1; padding: 14px; font-weight: bold; border-radius: 10px; text-align: center; border: none; color: #fff; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-prev { background: var(--bd); color: var(--fg); }
-  .btn-prev:hover:not(:disabled) { background: color-mix(in srgb, var(--bd) 80%, var(--fg)); }
-  .btn-next { background: var(--ac); box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); }
-  .btn-next:hover:not(:disabled) { background: var(--ac-hover); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
+  /* 作答後的下一題按鈕 */
+  .btn-next { background: var(--ac); color: #fff; border: none; padding: 14px; width: 100%; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); cursor: pointer; transition: all 0.2s ease; }
+  .btn-next:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 </style>
 </head>
 <body>
@@ -221,7 +224,6 @@ const SYSTEM_NOTICE = "歡迎使用學測國文刷題系統！\n目前已收錄 
 const SYNC_URL="";
 let Q=[],list=[],i=0,picks=new Set(),done=false;
 
-// 用來記錄這次測驗中，已經作答過的題目狀態
 let userAnswers = {}; 
 
 const A=document.getElementById("app");
@@ -295,27 +297,27 @@ function start(m,v){
     list.sort((a, b) => parseInt(a.n) - parseInt(b.n));
   }
   i=0;
-  userAnswers = {}; // 重置當次作答紀錄
+  userAnswers = {}; 
   show();
 }
 
 function show(){
   const q=list[i];
-  
-  // 載入這題是否已經作答過
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 🌟 獨立的上方「上一題」按鈕
-  let btnPrevTop = `<button onclick="prev()" ${i===0?'disabled':''} style="margin-right: 8px;">⬅️ 上一題</button>`;
+  // 把上一題與結束按鈕包在同一個 div 裡，利用 flex 完美靠右
+  let topActions = `
+    <div class="meta-actions">
+      <button onclick="prev()" ${i===0?'disabled':''}>⬅️ 上一題</button>
+      <button onclick="home()">結束</button>
+    </div>
+  `;
 
   A.innerHTML=`<div class="card">
     <p class="meta">
       <span>第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
-      <div>
-        ${btnPrevTop}
-        <button onclick="home()">結束</button>
-      </div>
+      ${topActions}
     </p>
     
     <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
@@ -327,19 +329,18 @@ function show(){
       } else if (picks.has(k)) {
         cls += " sel";
       }
-      // 如果已經作答 (done)，就加入 disabled 屬性，防止修改
       return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${t}</button>`;
     }).join("")+
     `<div id="f">${done ? generateFeedback(q) : `<button class="go" onclick="submit()">送出答案</button>`}</div>
   </div>`;
 }
 
-// 產生解答回饋區塊 (下方只剩「下一題」)
 function generateFeedback(q){
   const p = userAnswers[id(q)] ? [...userAnswers[id(q)]].sort().map(k=>L[k]).join("") : "";
   const ok = p == q.a;
   
-  let btnNext = `<button class="btn-nav btn-next" onclick="next()">${i+1<list.length?"下一題 ➡️":"完成並回首頁"}</button>`;
+  // 下方只保留下一題
+  let btnNext = `<button class="btn-next" onclick="next()">${i+1<list.length?"下一題 ➡️":"完成並回首頁"}</button>`;
 
   return `
     <div class="feedback" style="border-left-color: ${ok ? 'var(--ok)' : 'var(--no)'}">
@@ -347,9 +348,7 @@ function generateFeedback(q){
         ${ok ? "✅ 答對了！" : "❌ 答錯了"}
       </p>
       <p style="margin: 0 0 16px 0; font-size: 0.95rem;">正確答案：<strong>${q.a}</strong></p>
-      <div class="action-group" style="justify-content: flex-end;">
-        ${btnNext}
-      </div>
+      ${btnNext}
     </div>`;
 }
 
@@ -365,20 +364,18 @@ function submit(){
   done=true;
   const q=list[i],p=[...picks].sort().map(k=>L[k]).join(""),ok=p==q.a,s=S();
   
-  // 紀錄作答，並在重新渲染時鎖定
   userAnswers[id(q)] = [...picks];
   
   s.t++;
   if(ok){s.c++;delete s.w[id(q)]}else s.w[id(q)]=1;
   save(s);
   
-  // 更新按鈕顏色，並鎖定
   q.o.forEach((_,k)=>{
     const b=document.getElementById("o"+k);
     b.classList.remove("sel");
     if(q.a.includes(L[k]))b.classList.add("ok");
     else if(picks.has(k))b.classList.add("no");
-    b.disabled = true; // 🌟 關鍵：送出後禁用按鈕
+    b.disabled = true; 
   });
   
   document.getElementById("f").innerHTML = generateFeedback(q);
