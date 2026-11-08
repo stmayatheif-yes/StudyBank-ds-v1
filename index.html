@@ -104,16 +104,10 @@
   .go { background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); }
   .go:hover:not(:disabled) { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 
-  /* meta 區塊排版 */
   .meta { color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd); }
   .meta button { padding: 6px 12px; font-size: 0.85rem; margin: 0; }
-  
-  /* 確保按鈕群組可以完美靠右對齊 */
-  .meta-actions { display: flex; gap: 8px; align-items: center; }
-
   .feedback { margin-top: 20px; padding: 16px; border-radius: 8px; background: var(--bg); border-left: 4px solid var(--ac); }
 
-  /* 作答後的下一題按鈕 */
   .btn-next { background: var(--ac); color: #fff; border: none; padding: 14px; width: 100%; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); cursor: pointer; transition: all 0.2s ease; }
   .btn-next:hover { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
 </style>
@@ -306,18 +300,14 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
-  // 把上一題與結束按鈕包在同一個 div 裡，利用 flex 完美靠右
-  let topActions = `
-    <div class="meta-actions">
-      <button onclick="prev()" ${i===0?'disabled':''}>⬅️ 上一題</button>
-      <button onclick="home()">結束</button>
-    </div>
-  `;
-
+  // 確保「結束」按鈕在最右邊，且不被壓縮
   A.innerHTML=`<div class="card">
-    <p class="meta">
-      <span>第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
-      ${topActions}
+    <p class="meta" style="flex-wrap: nowrap;">
+      <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
+      <div style="display: flex; gap: 8px; flex-shrink: 0;">
+        <button onclick="prev()" ${i===0?'disabled':''} style="padding: 6px 12px; font-size: 0.85rem; margin: 0;">⬅️ 上一題</button>
+        <button onclick="home()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0;">結束</button>
+      </div>
     </p>
     
     <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
@@ -339,7 +329,6 @@ function generateFeedback(q){
   const p = userAnswers[id(q)] ? [...userAnswers[id(q)]].sort().map(k=>L[k]).join("") : "";
   const ok = p == q.a;
   
-  // 下方只保留下一題
   let btnNext = `<button class="btn-next" onclick="next()">${i+1<list.length?"下一題 ➡️":"完成並回首頁"}</button>`;
 
   return `
