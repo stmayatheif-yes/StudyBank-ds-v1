@@ -306,10 +306,16 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
 
+  // 🌟 獨立的上方「上一題」按鈕
+  let btnPrevTop = `<button onclick="prev()" ${i===0?'disabled':''} style="margin-right: 8px;">⬅️ 上一題</button>`;
+
   A.innerHTML=`<div class="card">
     <p class="meta">
       <span>第 ${i+1} / ${list.length} 題｜${q.y} 學測 第${q.n}題${q.a.length>1?"（多選）":""}</span>
-      <button onclick="home()">結束</button>
+      <div>
+        ${btnPrevTop}
+        <button onclick="home()">結束</button>
+      </div>
     </p>
     
     <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
@@ -328,12 +334,11 @@ function show(){
   </div>`;
 }
 
-// 產生解答回饋區塊與導覽按鈕
+// 產生解答回饋區塊 (下方只剩「下一題」)
 function generateFeedback(q){
   const p = userAnswers[id(q)] ? [...userAnswers[id(q)]].sort().map(k=>L[k]).join("") : "";
   const ok = p == q.a;
   
-  let btnPrev = `<button class="btn-nav btn-prev" onclick="prev()" ${i===0?'disabled':''}>⬅️ 上一題</button>`;
   let btnNext = `<button class="btn-nav btn-next" onclick="next()">${i+1<list.length?"下一題 ➡️":"完成並回首頁"}</button>`;
 
   return `
@@ -342,8 +347,7 @@ function generateFeedback(q){
         ${ok ? "✅ 答對了！" : "❌ 答錯了"}
       </p>
       <p style="margin: 0 0 16px 0; font-size: 0.95rem;">正確答案：<strong>${q.a}</strong></p>
-      <div class="action-group">
-        ${btnPrev}
+      <div class="action-group" style="justify-content: flex-end;">
         ${btnNext}
       </div>
     </div>`;
