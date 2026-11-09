@@ -239,7 +239,9 @@ function searchQuestions() {
   currentSearchResults.sort((a, b) => a.y !== b.y ? a.y - b.y : parseInt(a.n) - parseInt(b.n));
   let html = `<p style="font-size: 0.9rem; margin-bottom: 12px;">找到 <strong>${currentSearchResults.length}</strong> 筆結果：</p>`;
   currentSearchResults.forEach((q, index) => {
-    let textToShow = q.q;
+    let tempDiv = document.createElement("div");
+    tempDiv.innerHTML = q.q;
+    let textToShow = tempDiv.textContent || tempDiv.innerText || "";
     const normTextToShow = normalizeText(textToShow).toLowerCase();
     let matchIndex = normTextToShow.indexOf(normKeyword);
     if (matchIndex > 40) textToShow = "..." + textToShow.substring(matchIndex - 30, matchIndex + 40) + "...";
