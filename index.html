@@ -149,7 +149,7 @@
 
 <script>
 const VERSION_HISTORY = [
-  { version: "v1.10.2", desc: "歷屆試題題目重灌。\n• 修復生僻字顯示錯誤。\n• 修復部份題目表格未顯示錯誤。\n• 修復部份題目內容不完整錯誤。\n• 優化部份圖片無法顯示功能。以文字描述取代。", date: "11/09 21：00" },
+  { version: "v1.10.2", desc: "歷屆試題題目重灌。\n• 修復生僻字顯示錯誤。\n• 修復部份題目表格未顯示錯誤。\n• 修復部份題目內容不完整錯誤。\n• 優化部份圖片無法顯示功能，以文字描述取代。", date: "11/09 21:00" },
   { version: "v1.10.1", desc: "優化錯題本複習功能邏輯。", date: "11/09 17:30" },
   { version: "v1.10.0", desc: "優化歷史版本一覽介面。", date: "11/09 08:15" },
   { version: "v1.9.0", desc: "網站圖標煥新，取代emoji。", date: "11/09 00:35" },
@@ -168,7 +168,7 @@ const VERSION_HISTORY = [
 
 function renderVersions() {
   const current = VERSION_HISTORY[0];
-  document.getElementById('currentVersionContent').innerHTML = `★當前版本：${current.version}<br>★版本內容：${current.desc}<br>★更新時間：${current.date}`;
+ document.getElementById('currentVersionContent').innerHTML = `★當前版本：${current.version}<br>★版本內容：${current.desc.replace(/\n/g, '<br>')}<br>★更新時間：${current.date}`;
   const v1History = VERSION_HISTORY.filter(v => v.version.startsWith('v1.'));
   const sortedV1 = [...v1History].reverse();
   let historyHTML = "";
