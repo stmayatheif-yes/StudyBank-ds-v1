@@ -204,7 +204,7 @@
   </div>
 </div>
 
-<!-- 歷史版本彈窗 (加入折疊分類，預設關閉) -->
+<!-- 歷史版本彈窗 -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>
@@ -212,13 +212,11 @@
       歷史版本
     </h3>
     
-    <!-- 1.0 版本系列 -->
     <details class="version-group">
       <summary>1.0 版本系列</summary>
       <div class="history-scroll-container" id="historyList1"></div>
     </details>
 
-    <!-- 2.0 版本系列 (預留) -->
     <details class="version-group">
       <summary>2.0 版本系列</summary>
       <div style="padding: 16px; text-align: center; opacity: 0.6; font-size: 0.9rem;">
@@ -363,7 +361,7 @@ let selectedType = null;
 let sessionStats = { total: 0, correct: 0 };
 let currentSearchResults = []; 
 
-// 🌟 新增：判斷這次刷題是否為「錯題本複習」
+// 🌟 核心變數：記錄這次刷題是否為「錯題本複習」
 let isReviewingWrong = false; 
 
 const A=document.getElementById("app");
@@ -670,16 +668,15 @@ function submit(){
   const q=list[i],p=[...picks].sort().map(k=>L[k]).join(""),ok=p==q.a,s=S();
   
   userAnswers[id(q)] = [...picks];
-  if(ok) sessionStats.correct++;
-
-  // 🌟 核心邏輯修改區 🌟
+  
+  // 🌟 核心邏輯：全部交由情境判斷，移除了最上面的 sessionStats.correct++
   if (isReviewingWrong) {
     // 情境一：在錯題本裡複習
     if (ok) {
-      // 答對了：總作答數不變 (s.t 不加)，且將該題移出錯題本
+      // 答對了：總作答數與答對數都不變，且將該題移出錯題本
       delete s.w[id(q)];
     } else {
-      // 答錯了：總作答數 +1，繼續留在錯題本
+      // 答錯了：總作答數 +1，答對數不變，繼續留在錯題本
       s.t++;
       s.w[id(q)] = 1;
     }
@@ -688,15 +685,13 @@ function submit(){
     s.t++;
     if (ok) {
       s.c++;
-      // 答對了：不將它從錯題本移除 (即使它原本在錯題本裡)
-      // 所以這裡刻意不執行 delete s.w[id(q)]
+      // 答對了：不將它從錯題本移除
     } else {
       // 答錯了：加入錯題本
       s.w[id(q)] = 1;
     }
   }
   save(s);
-  // 🌟 邏輯修改結束 🌟
   
   q.o.forEach((_,k)=>{
     const b=document.getElementById("o"+k);
