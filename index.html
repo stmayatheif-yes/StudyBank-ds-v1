@@ -88,7 +88,7 @@
   
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   
-  /* 🌟 新增：折疊選單 (Accordion) 樣式 */
+  /* 折疊選單 (Accordion) 樣式 */
   details.version-group {
     margin-bottom: 16px;
     background: var(--bg);
@@ -204,7 +204,7 @@
   </div>
 </div>
 
-<!-- 歷史版本彈窗 (加入折疊分類) -->
+<!-- 歷史版本彈窗 (加入折疊分類，預設關閉) -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>
@@ -212,8 +212,8 @@
       歷史版本
     </h3>
     
-    <!-- 1.0 版本系列 -->
-    <details class="version-group" open>
+    <!-- 1.0 版本系列 (已移除 open 屬性，預設關閉) -->
+    <details class="version-group">
       <summary>1.0 版本系列</summary>
       <div class="history-scroll-container" id="historyList1"></div>
     </details>
