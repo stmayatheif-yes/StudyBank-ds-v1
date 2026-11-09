@@ -174,7 +174,7 @@ function renderVersions() {
   let historyHTML = "";
   sortedV1.forEach((item, index) => {
     const isLatest = index === sortedV1.length - 1; 
-    historyHTML += `<div class="history-item-horizontal ${isLatest ? 'latest' : ''}"><strong>${item.version}</strong><div class="history-date">${item.date}</div><div class="history-desc">${item.desc}</div></div>`;
+    historyHTML += `<div class="history-item-horizontal ${isLatest ? 'latest' : ''}"><strong>${item.version}</strong><div class="history-date">${item.date}</div><div class="history-desc">${item.desc.replace(/\n/g, '<br>')}</div></div>`;
   });
   document.getElementById('historyList1').innerHTML = historyHTML;
 }
