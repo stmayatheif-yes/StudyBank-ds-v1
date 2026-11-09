@@ -365,8 +365,8 @@ let currentSearchResults = [];
 
 const A=document.getElementById("app");
 const id=q=>q.y+"-"+q.n;
-const S=()=>{try{return JSON.parse(localStorage.getItem("qb"))||{w:{},c:0,t:0}}catch(e){return{w:{},c:0,t:0}}};
-const save=s=>{try{localStorage.setItem("qb",JSON.stringify(s))}catch(e){}};
+const S=()=>{try{return JSON.parse(localStorage.getItem("qb_study"))||{w:{},c:0,t:0}}catch(e){return{w:{},c:0,t:0}}};
+const save=s=>{try{localStorage.setItem("qb_study",JSON.stringify(s))}catch(e){}};
 const L="ABCDE";
 
 Promise.all(["./questions.json","./q2.json","./q3.json","./q4.json","./q5.json","./q6.json"].map(f=>fetch(f).then(r=>r.ok?r.json():[]).catch(()=>[]))).then(a=>{Q=a.flat();if(!Q.length)throw 0;home()}).catch(()=>A.textContent="讀取失敗，請確認題庫已上傳");
