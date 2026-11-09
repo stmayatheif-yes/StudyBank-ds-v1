@@ -88,9 +88,43 @@
   
   .modal-content h3 { margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid var(--bd); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   
-  .history-scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 20px 0 10px 0; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+  /* 🌟 新增：折疊選單 (Accordion) 樣式 */
+  details.version-group {
+    margin-bottom: 16px;
+    background: var(--bg);
+    border: 1px solid var(--bd);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  details.version-group summary {
+    padding: 12px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ac);
+    user-select: none;
+    transition: background 0.2s ease;
+  }
+  details.version-group summary::-webkit-details-marker { display: none; }
+  details.version-group summary:hover { background: color-mix(in srgb, var(--ac) 8%, var(--card)); }
+  
+  /* 動畫箭頭 */
+  details.version-group summary::before {
+    content: '▶';
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+  }
+  details.version-group[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  .history-scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 20px 16px 10px 16px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; border-top: 1px dashed var(--bd); }
   .history-scroll-container::-webkit-scrollbar { display: none; }
-  .history-item-horizontal { flex: 0 0 200px; background: var(--bg); border: 1px solid var(--bd); border-radius: 10px; padding: 16px; position: relative; display: flex; flex-direction: column; }
+  
+  .history-item-horizontal { flex: 0 0 200px; background: var(--card); border: 1px solid var(--bd); border-radius: 10px; padding: 16px; position: relative; display: flex; flex-direction: column; }
   .history-item-horizontal::before { content: ''; position: absolute; top: -6px; left: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--bd); }
   .history-item-horizontal.latest::before { background: var(--ac); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 30%, transparent); }
   .history-item-horizontal strong { color: var(--ac); font-size: 1rem; margin-bottom: 4px; }
@@ -170,14 +204,28 @@
   </div>
 </div>
 
-<!-- 歷史版本彈窗 -->
+<!-- 歷史版本彈窗 (加入折疊分類) -->
 <div id="historyModal" class="modal-overlay" onclick="closeVersionModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
       歷史版本
     </h3>
-    <div class="history-scroll-container" id="historyList"></div>
+    
+    <!-- 1.0 版本系列 -->
+    <details class="version-group" open>
+      <summary>1.0 版本系列</summary>
+      <div class="history-scroll-container" id="historyList1"></div>
+    </details>
+
+    <!-- 2.0 版本系列 (預留) -->
+    <details class="version-group">
+      <summary>2.0 版本系列</summary>
+      <div style="padding: 16px; text-align: center; opacity: 0.6; font-size: 0.9rem;">
+        敬請期待未來的更新！
+      </div>
+    </details>
+
     <div class="modal-actions">
       <button class="go" onclick="closeVersionModal()">關閉</button>
     </div>
@@ -251,10 +299,13 @@ function renderVersions() {
     ★更新時間：${current.date}
   `;
 
+  // 🌟 將 1.x.x 的版本過濾出來，並反轉讓最舊的排在最左邊
+  const v1History = VERSION_HISTORY.filter(v => v.version.startsWith('v1.'));
+  const sortedV1 = [...v1History].reverse();
+  
   let historyHTML = "";
-  const sortedHistory = [...VERSION_HISTORY].reverse(); 
-  sortedHistory.forEach((item, index) => {
-    const isLatest = index === sortedHistory.length - 1; 
+  sortedV1.forEach((item, index) => {
+    const isLatest = index === sortedV1.length - 1; 
     historyHTML += `
       <div class="history-item-horizontal ${isLatest ? 'latest' : ''}">
         <strong>${item.version}</strong>
@@ -263,7 +314,7 @@ function renderVersions() {
       </div>
     `;
   });
-  document.getElementById('historyList').innerHTML = historyHTML;
+  document.getElementById('historyList1').innerHTML = historyHTML;
 }
 renderVersions();
 
