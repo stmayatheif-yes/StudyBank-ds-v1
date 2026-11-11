@@ -250,10 +250,13 @@
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18"></path><path d="M21 11v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path><path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"></path><path d="M12 3v4"></path><path d="M12 16v4"></path></svg> 系統公告</h3>
     <div id="currentAnnouncementContent" style="text-align: center;"></div>
-    <div class="modal-actions">
-      <a class="history-link" onclick="switchModal('announcementModal', 'historyAnnouncementModal')">查看歷史公告 &gt;</a>
+    
+    <!-- 把關閉按鈕的 margin-top 縮小一點，讓它稍微往上 -->
+    <div class="modal-actions" style="margin-top: 16px;">
       <button class="go" onclick="closeAnnouncementModal()">關閉</button>
     </div>
+    <!-- 把歷史公告移到下面置中 -->
+    <a class="history-link" onclick="switchModal('announcementModal', 'historyAnnouncementModal')">查看歷史公告 &gt;</a>
   </div>
 </div>
 
