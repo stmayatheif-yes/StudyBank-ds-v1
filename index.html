@@ -312,7 +312,16 @@ function renderAnnouncements() {
   if (!ANNOUNCEMENTS.length) return;
   
   const latest = ANNOUNCEMENTS[0];
-  const marqueeHTML = `<div class="marquee-container" id="marqueeBar" onclick="openAnnouncementModal()"><div class="marquee-content">📢 系統公告：${latest.title}</div></div>`;
+  // 把前綴跟滾動內容分開
+const marqueeHTML = `
+  <div class="marquee-container" id="marqueeBar" onclick="openAnnouncementModal()">
+    <span class="marquee-prefix">📢 系統公告</span>
+    <span class="marquee-hint">[點擊展開]</span>
+    <span class="marquee-prefix">：</span>
+    <div class="marquee-content-wrapper">
+      <div class="marquee-content">${latest.title}</div>
+    </div>
+  </div>`;
   
   const sysNotice = document.querySelector('.sys-notice');
   if (sysNotice) {
