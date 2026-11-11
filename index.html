@@ -310,12 +310,12 @@ const marqueeHTML = `
   }
 
   document.getElementById('currentAnnouncementContent').innerHTML = `
-    <div class="announcement-item" style="text-align: center;">
-      <div class="announcement-date">${latest.date}</div>
-      <div class="announcement-title">${latest.title.replace(/\n/g, '<br>')}</div>
-    </div>
-  `;
-
+  <div class="announcement-item">
+    <div class="announcement-date">${latest.date}</div>
+    <div class="announcement-title">${latest.title.replace(/\n/g, '<br>')}</div>
+  </div>
+`;
+  
   const history = ANNOUNCEMENTS.slice(1);
   if (history.length === 0) {
     document.getElementById('historyAnnouncementContent').innerHTML = `<p style="text-align: center; opacity: 0.6;">目前沒有歷史公告。</p>`;
