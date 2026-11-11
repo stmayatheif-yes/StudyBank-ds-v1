@@ -89,6 +89,53 @@
   .highlight { color: #ef4444; font-weight: bold; }
   table { border-collapse: collapse; }
   table td { border: 1px solid var(--bd); padding: 6px 10px; }
+
+  /* 📢 跑馬燈外框 */
+  .marquee-container {
+    background: var(--notice-bg);
+    border: 1px solid var(--notice-bd);
+    color: var(--notice-fg);
+    border-radius: var(--radius);
+    padding: 12px 0; /* 上下留白 */
+    margin-bottom: 20px;
+    cursor: pointer;
+    overflow: hidden; /* 隱藏超出範圍的文字 */
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+  }
+  .marquee-container:hover { border-color: var(--ac); }
+  
+  /* 跑馬燈文字動畫 */
+  .marquee-content {
+    display: inline-block;
+    padding-left: 100%; /* 從最右邊開始 */
+    animation: scrollLeft 15s linear infinite; /* 15秒跑完，無限循環 */
+  }
+  /* 當暫停時（加上 paused class） */
+  .marquee-container.paused .marquee-content { animation-play-state: paused; }
+  
+  @keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  
+  /* 系統公告內文的樣式 */
+  .announcement-item {
+    text-align: left;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--bd);
+  }
+  .announcement-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .announcement-date { font-size: 0.85rem; color: var(--ac); font-weight: bold; margin-bottom: 4px; }
+  .announcement-title { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
+  
+  /* 歷史公告按鈕 */
+  .history-link { display: inline-block; margin-top: 16px; font-size: 0.9rem; color: var(--fg); opacity: 0.7; text-decoration: underline; cursor: pointer; transition: 0.2s; }
+  .history-link:hover { opacity: 1; color: var(--ac); }
 </style>
 </head>
 <body>
@@ -147,7 +194,34 @@
   <div class="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
+<!-- 最新公告彈窗 -->
+<div id="announcementModal" class="modal-overlay" onclick="closeAnnouncementModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18"></path><path d="M21 11v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path><path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"></path><path d="M12 3v4"></path><path d="M12 16v4"></path></svg> 系統公告</h3>
+    <div id="currentAnnouncementContent" style="text-align: center;"></div>
+    <div class="modal-actions">
+      <a class="history-link" onclick="switchModal('announcementModal', 'historyAnnouncementModal')">查看歷史公告 &gt;</a>
+      <button class="go" onclick="closeAnnouncementModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 歷史公告彈窗 -->
+<div id="historyAnnouncementModal" class="modal-overlay" onclick="closeAnnouncementModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="9"></circle></svg> 歷史公告</h3>
+    <div id="historyAnnouncementContent"></div>
+    <div class="modal-actions"><button class="go" onclick="closeAnnouncementModal()">關閉</button></div>
+  </div>
+</div>
+
 <script>
+// 📢 系統公告資料（未來只要在這裡加資料即可）
+const ANNOUNCEMENTS = [
+  { date: "11/10", title: "預計11/12 進行2.0.0版本更新00:00~23:59" },
+  { date: "11/08", title: "題庫已全數更新完畢，歡迎多加利用。" }
+];
+
 const VERSION_HISTORY = [
   { version: "v1.10.0", desc: "歷屆試題題目進行重灌，修復大部份題目錯誤處。\n• 修復生僻字顯示錯誤。\n• 修復部份題目表格未顯示錯誤。\n• 修復部份題目內容不完整錯誤。\n• 優化部份圖片無法顯示功能，以文字描述取代。", date: "11/09 21:00" },
   { version: "v1.9.1", desc: "優化錯題本複習功能邏輯。", date: "11/09 17:30" },
@@ -168,7 +242,7 @@ const VERSION_HISTORY = [
 
 function renderVersions() {
   const current = VERSION_HISTORY[0];
- document.getElementById('currentVersionContent').innerHTML = `★當前版本：${current.version}<br>★版本內容：${current.desc.replace(/\n/g, '<br>')}<br>★更新時間：${current.date}`;
+  document.getElementById('currentVersionContent').innerHTML = `★當前版本：${current.version}<br>★版本內容：${current.desc.replace(/\n/g, '<br>')}<br>★更新時間：${current.date}`;
   const v1History = VERSION_HISTORY.filter(v => v.version.startsWith('v1.'));
   const sortedV1 = [...v1History].reverse();
   let historyHTML = "";
@@ -179,6 +253,54 @@ function renderVersions() {
   document.getElementById('historyList1').innerHTML = historyHTML;
 }
 renderVersions();
+
+function renderAnnouncements() {
+  if (!ANNOUNCEMENTS.length) return;
+  
+  const latest = ANNOUNCEMENTS[0];
+  const marqueeHTML = `<div class="marquee-container" id="marqueeBar" onclick="openAnnouncementModal()"><div class="marquee-content">📢 系統公告：${latest.title}</div></div>`;
+  
+  const sysNotice = document.querySelector('.sys-notice');
+  if (sysNotice) {
+    sysNotice.insertAdjacentHTML('afterend', marqueeHTML);
+  } else {
+    document.querySelector('main').insertAdjacentHTML('afterbegin', marqueeHTML);
+  }
+
+  document.getElementById('currentAnnouncementContent').innerHTML = `
+    <div class="announcement-item" style="text-align: center;">
+      <div class="announcement-date">${latest.date}</div>
+      <div class="announcement-title">${latest.title.replace(/\n/g, '<br>')}</div>
+    </div>
+  `;
+
+  const history = ANNOUNCEMENTS.slice(1);
+  if (history.length === 0) {
+    document.getElementById('historyAnnouncementContent').innerHTML = `<p style="text-align: center; opacity: 0.6;">目前沒有歷史公告。</p>`;
+  } else {
+    document.getElementById('historyAnnouncementContent').innerHTML = history.map(item => `
+      <div class="announcement-item">
+        <div class="announcement-date">${item.date}</div>
+        <div class="announcement-title">${item.title.replace(/\n/g, '<br>')}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function openAnnouncementModal() {
+  document.getElementById('marqueeBar').classList.add('paused');
+  document.getElementById('announcementModal').classList.add('active');
+}
+
+function closeAnnouncementModal(e) {
+  if (!e || e.target.classList.contains('modal-overlay') || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+    document.getElementById('announcementModal').classList.remove('active');
+    document.getElementById('historyAnnouncementModal').classList.remove('active');
+    if(document.getElementById('marqueeBar')) {
+      document.getElementById('marqueeBar').classList.remove('paused');
+    }
+  }
+}
 
 const themeToggleBtn = document.getElementById('themeToggle');
 function initTheme() {
@@ -204,7 +326,6 @@ let selectedType = null;
 let sessionStats = { total: 0, correct: 0 };
 let currentSearchResults = []; 
 
-// 🌟 核心變數：記錄這次刷題是否為「錯題本複習」
 let isReviewingWrong = false; 
 
 const A=document.getElementById("app");
@@ -299,6 +420,7 @@ function home(){
       </div>
     </div>
   </div>`;
+  renderAnnouncements();
 }
 
 function start(m,v){
@@ -354,22 +476,11 @@ function submit(){
   
   userAnswers[id(q)] = [...picks];
   
-  // 🌟 核心計分邏輯 🌟
   if (isReviewingWrong) {
-    // 情境 A：在錯題本裡複習
-    if (ok) {
-      delete s.w[id(q)]; // 答對：消滅錯題。s.t 與 s.c 都不加。
-    } else {
-      s.w[id(q)] = 1;    // 答錯：維持錯題。s.t 與 s.c 都不加。
-    }
+    if (ok) { delete s.w[id(q)]; } else { s.w[id(q)] = 1; }
   } else {
-    // 情境 B：一般刷題
-    s.t++; // 不論對錯，總作答 +1
-    if (ok) {
-      s.c++;           // 答對：答對數 +1
-    } else {
-      s.w[id(q)] = 1;  // 答錯：加入錯題本
-    }
+    s.t++; 
+    if (ok) { s.c++; } else { s.w[id(q)] = 1; }
   }
   save(s);
   
