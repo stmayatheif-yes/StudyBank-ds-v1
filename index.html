@@ -278,9 +278,13 @@ function renderAnnouncements() {
   // 把前綴跟滾動內容分開
 const marqueeHTML = `
   <div class="marquee-container" id="marqueeBar" onclick="openAnnouncementModal()">
-    <span class="marquee-prefix">📢 系統公告</span>
-    <span class="marquee-hint">[點擊展開]</span>
-    <span class="marquee-prefix">：</span>
+    <!-- 第一行：固定的標題 -->
+    <div class="marquee-header">
+      <span class="marquee-prefix">📢 系統公告</span>
+      <span class="marquee-hint">[點擊展開]</span>
+      <span class="marquee-prefix">：</span>
+    </div>
+    <!-- 第二行：跑馬燈內容 -->
     <div class="marquee-content-wrapper">
       <div class="marquee-content">${latest.title}</div>
     </div>
