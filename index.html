@@ -90,42 +90,48 @@
   table { border-collapse: collapse; }
   table td { border: 1px solid var(--bd); padding: 6px 10px; }
 
-  /* 📢 跑馬燈外框（改為 Flex 排版以固定前綴） */
+  /* 📢 雙行跑馬燈外框 */
 .marquee-container {
   background: var(--notice-bg);
   border: 1px solid var(--notice-bd);
   color: var(--notice-fg);
-  font-size: 0.87rem; 
   border-radius: var(--radius);
-  padding: 12px 16px; /* 左右加點內距 */
+  padding: 12px 16px; /* 調整內距，讓上下不要太擠 */
   margin-bottom: 20px;
   cursor: pointer;
-  display: flex; /* 讓前綴跟滾動內容並排 */
-  align-items: center;
+  display: flex;
+  flex-direction: column; /* 👈 關鍵：改為垂直排列 */
   box-shadow: var(--shadow);
   transition: border-color 0.2s;
-  overflow: hidden; /* 隱藏超出範圍的滾動文字 */
+  overflow: hidden;
+  font-size: 0.95rem; /* 控制整體文字大小 */
 }
 .marquee-container:hover { border-color: var(--ac); }
 
-/* 固定的前綴文字 */
-.marquee-prefix {
-  flex-shrink: 0; /* 確保不會被壓縮 */
-  font-weight: 500;
+/* 第一行：固定不動的標題 */
+.marquee-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px; /* 與第二行保持距離 */
   z-index: 2;
 }
 
-/* 點擊展開的提示字（略小、淡灰） */
+.marquee-prefix {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
 .marquee-hint {
-  font-size: 0.75em;
+  font-size: 0.75rem;
   color: var(--fg);
   opacity: 0.5;
   margin: 0 4px;
+  flex-shrink: 0;
 }
 
-/* 滾動的內容容器 */
+/* 第二行：滾動的內容容器 */
 .marquee-content-wrapper {
-  flex: 1;
+  width: 100%;
   overflow: hidden;
   position: relative;
 }
@@ -138,56 +144,12 @@
   white-space: nowrap;
 }
 
-/* 暫停動畫 */
 .marquee-container.paused .marquee-content { animation-play-state: paused; }
 
 @keyframes scrollLeft {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
-
-/* 歷史公告按鈕（改為置中，放在關閉下方） */
-.history-link { 
-  display: block; 
-  text-align: center;
-  margin-top: 16px; 
-  font-size: 0.9rem; 
-  color: var(--fg); 
-  opacity: 0.7; 
-  text-decoration: underline; 
-  cursor: pointer; 
-  transition: 0.2s; 
-}
-.history-link:hover { opacity: 1; color: var(--ac); }
-  
-  /* 跑馬燈文字動畫 */
-  .marquee-content {
-    display: inline-block;
-    padding-left: 100%; /* 從最右邊開始 */
-    animation: scrollLeft 15s linear infinite; /* 15秒跑完，無限循環 */
-  }
-  /* 當暫停時（加上 paused class） */
-  .marquee-container.paused .marquee-content { animation-play-state: paused; }
-  
-  @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-  
-  /* 系統公告內文的樣式 */
-  .announcement-item {
-    text-align: left;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px dashed var(--bd);
-  }
-  .announcement-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .announcement-date { font-size: 0.85rem; color: var(--ac); font-weight: bold; margin-bottom: 4px; }
-  .announcement-title { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
-  
-  /* 歷史公告按鈕 */
-  .history-link { display: inline-block; margin-top: 16px; font-size: 0.9rem; color: var(--fg); opacity: 0.7; text-decoration: underline; cursor: pointer; transition: 0.2s; }
-  .history-link:hover { opacity: 1; color: var(--ac); }
 </style>
 </head>
 <body>
