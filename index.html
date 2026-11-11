@@ -245,13 +245,13 @@
 <script>
 // 📢 系統公告資料（未來只要在這裡加資料即可）
 const ANNOUNCEMENTS = [
-  { date: "11/11 17:30", title: "★預計11/12更新至2.0.0版本！\n• 版本維護時間：08:00~16:00(視維護情況可能提前或延後完成維護。)\n• 版本維護期間網站可正常使用，版本維護後會自動升級至2.0.0版本。" },
-  { date: "11/11 16:30", title: "1.10.5版本已更新完畢。\n• 更新內容：新增系統公告功能，可關注網頁的最新消息。" },
+  { date: "11/11 17:30", title: "★預計11/12將更新至2.0.0版本！\n• 版本維護時間：08:00~16:00(視維護情況可能提前或延後完成維護。)\n• 版本維護期間網站可正常使用，有一定概率會暫時無法使用，敬請見諒。版本維護後會自動升級至2.0.0版本。" },
+  { date: "11/11 17:00", title: "1.10.5版本已更新完畢。\n• 更新內容：新增系統公告功能，可關注網頁的最新消息。" },
   { date: "11/09 21:00", title: "1.10.0版本已更新完畢。\n• 優化內容：歷屆試題題目進行重灌，修復大部分錯誤。" }
 ];
 
 const VERSION_HISTORY = [
-  { version: "v1.10.5", desc: "新增系統公告功能，可關注網頁的最新消息。", date: "11/11 16:30" },
+  { version: "v1.10.5", desc: "新增系統公告功能，可關注網頁的最新消息。", date: "11/11 17:00" },
   { version: "v1.10.0", desc: "歷屆試題題目進行重灌，修復大部份題目錯誤處。\n• 修復生僻字顯示錯誤。\n• 修復部份題目表格未顯示錯誤。\n• 修復部份題目內容不完整錯誤。\n• 優化部份圖片無法顯示功能，以文字描述取代。", date: "11/09 21:00" },
   { version: "v1.9.1", desc: "優化錯題本複習功能邏輯。", date: "11/09 17:30" },
   { version: "v1.9.0", desc: "優化歷史版本一覽介面。", date: "11/09 08:15" },
@@ -454,7 +454,7 @@ function home(){
       <button class="go" onclick="openTypeModal()" style="background: var(--ok); box-shadow: 0 2px 4px color-mix(in srgb, var(--ok) 40%, transparent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>針對題型練習</button>
       <div style="display: flex; gap: 8px; align-items: center;">
         <select id="yr" style="flex: 1;">${ys.map(y=>`<option value="${y}">${y} 年</option>`)}</select>
-        <button onclick="start('y',yr.value)" style="flex: 1; display: flex; align-items: center; justify-content: center;">依年度</button>
+        <button onclick="start('y',yr.value)" style="flex: 1; display: flex; align-items: center; justify-content: center;">依年度開始</button>
       </div>
       <div style="display: flex; gap: 8px;">
         <button onclick="start('w')" style="flex: 1; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>錯題本</button>
