@@ -91,66 +91,75 @@
   table td { border: 1px solid var(--bd); padding: 6px 10px; }
 
   /* 📢 雙行跑馬燈外框 */
-.marquee-container {
-  background: var(--notice-bg);
-  border: 1px solid var(--notice-bd);
-  color: var(--notice-fg);
-  font-size: 0.87rem; 
-  border-radius: var(--radius);
-  padding: 12px 16px; /* 調整內距，讓上下不要太擠 */
-  margin-bottom: 20px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column; /* 👈 關鍵：改為垂直排列 */
-  box-shadow: var(--shadow);
-  transition: border-color 0.2s;
-  overflow: hidden;
-  font-size: 0.95rem; /* 控制整體文字大小 */
-}
-.marquee-container:hover { border-color: var(--ac); }
+  .marquee-container {
+    background: var(--notice-bg);
+    border: 1px solid var(--notice-bd);
+    color: var(--notice-fg);
+    border-radius: var(--radius);
+    padding: 12px 16px; /* 調整內距，讓上下不要太擠 */
+    margin-bottom: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column; /* 👈 關鍵：改為垂直排列 */
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+    overflow: hidden;
+    font-size: 0.95rem; /* 控制整體文字大小 */
+  }
+  .marquee-container:hover { border-color: var(--ac); }
 
-/* 第一行：固定不動的標題 */
-.marquee-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px; /* 與第二行保持距離 */
-  z-index: 2;
-}
+  /* 第一行：固定不動的標題 */
+  .marquee-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px; /* 與第二行保持距離 */
+    z-index: 2;
+  }
 
-.marquee-prefix {
-  flex-shrink: 0;
-  font-weight: 500;
-}
+  .marquee-prefix {
+    flex-shrink: 0;
+    font-weight: 500;
+  }
 
-.marquee-hint {
-  font-size: 0.75rem;
-  color: var(--fg);
-  opacity: 0.5;
-  margin: 0 4px;
-  flex-shrink: 0;
-}
+  .marquee-hint {
+    font-size: 0.75rem;
+    color: var(--fg);
+    opacity: 0.5;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
 
-/* 第二行：滾動的內容容器 */
-.marquee-content-wrapper {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
+  /* 第二行：滾動的內容容器 */
+  .marquee-content-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
 
-/* 滾動的文字本體 */
-.marquee-content {
-  display: inline-block;
-  padding-left: 100%; /* 從最右邊開始 */
-  animation: scrollLeft 15s linear infinite;
-  white-space: nowrap;
-}
+  /* 滾動的文字本體 */
+  .marquee-content {
+    display: inline-block;
+    padding-left: 100%; /* 從最右邊開始 */
+    animation: scrollLeft 15s linear infinite;
+    white-space: nowrap;
+  }
 
-.marquee-container.paused .marquee-content { animation-play-state: paused; }
+  .marquee-container.paused .marquee-content { animation-play-state: paused; }
 
-@keyframes scrollLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
+  @keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* 系統公告內文的樣式 */
+  .announcement-item { text-align: left; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--bd); }
+  .announcement-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .announcement-date { font-size: 0.85rem; color: var(--ac); font-weight: bold; margin-bottom: 4px; }
+  .announcement-title { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
+  
+  /* 歷史公告按鈕 */
+  .history-link { display: block; text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--fg); opacity: 0.7; text-decoration: underline; cursor: pointer; transition: 0.2s; }
+  .history-link:hover { opacity: 1; color: var(--ac); }
 </style>
 </head>
 <body>
@@ -237,7 +246,7 @@
 // 📢 系統公告資料（未來只要在這裡加資料即可）
 const ANNOUNCEMENTS = [
   { date: "11/11 17:30", title: "預計11/12當日開始更新至2.0.0版本！  版本維護時間：08:00~16:00 版本維護期間網站可正常使用，版本維護後會自動升級至2.0.0版本。" },
-  { date: "11/11 16:30", title: "1.10.5版本已更新完畢。 更新內容：新增系統公告功能，可關注網頁的最新消息。" }
+  { date: "11/11 16:30", title: "1.10.5版本已更新完畢。 更新內容：新增系統公告功能，可關注網頁的最新消息。" },
   { date: "11/09 21:00", title: "1.10.0版本已更新完畢。 優化內容：歷屆試題題目進行重灌，修復大部分錯誤。" }
 ];
 
