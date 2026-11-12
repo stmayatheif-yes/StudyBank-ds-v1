@@ -73,6 +73,9 @@
   .ok { border-color: var(--ok) !important; background: color-mix(in srgb, var(--ok) 15%, var(--card)) !important; color: var(--ok); }
   .no { border-color: var(--no) !important; background: color-mix(in srgb, var(--no) 15%, var(--card)) !important; color: var(--no); }
   
+  /* 🌟 新增：漏選的正確答案（空心綠框） */
+  .missed { border-color: var(--ok) !important; background: transparent !important; color: var(--ok); border-style: dashed !important; }
+
   .go { background: var(--ac); color: #fff; border: none; font-weight: bold; width: 100%; padding: 14px; margin-top: 12px; border-radius: 10px; box-shadow: 0 2px 4px color-mix(in srgb, var(--ac) 40%, transparent); display: flex; align-items: center; justify-content: center; gap: 8px; }
   .go:hover:not(:disabled) { background: var(--ac-hover); transform: translateY(-2px); box-shadow: 0 4px 8px color-mix(in srgb, var(--ac) 50%, transparent); }
   .meta { color: var(--fg); opacity: 0.6; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd); }
@@ -96,57 +99,29 @@
     border: 1px solid var(--notice-bd);
     color: var(--notice-fg);
     border-radius: var(--radius);
-    padding: 12px 16px; /* 調整內距，讓上下不要太擠 */
+    padding: 12px 16px;
     margin-bottom: 20px;
     cursor: pointer;
     display: flex;
-    flex-direction: column; /* 👈 關鍵：改為垂直排列 */
+    flex-direction: column;
     box-shadow: var(--shadow);
     transition: border-color 0.2s;
     overflow: hidden;
-    font-size: 0.95rem; /* 控制整體文字大小 */
+    font-size: 0.95rem;
   }
   .marquee-container:hover { border-color: var(--ac); }
 
-  /* 第一行：固定不動的標題 */
-  .marquee-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px; /* 與第二行保持距離 */
-    z-index: 2;
-  }
-
-  .marquee-prefix {
-    flex-shrink: 0;
-    font-weight: 500;
-  }
-
-  .marquee-hint {
-    font-size: 0.75rem;
-    color: var(--fg);
-    opacity: 0.5;
-    margin: 0 4px;
-    flex-shrink: 0;
-  }
-
-  /* 第二行：滾動的內容容器 */
-  .marquee-content-wrapper {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* 滾動的文字本體 */
+  .marquee-header { display: flex; align-items: center; margin-bottom: 4px; z-index: 2; }
+  .marquee-prefix { flex-shrink: 0; font-weight: 500; }
+  .marquee-hint { font-size: 0.75rem; color: var(--fg); opacity: 0.5; margin: 0 4px; flex-shrink: 0; }
+  .marquee-content-wrapper { width: 100%; overflow: hidden; position: relative; }
   .marquee-content {
     display: inline-block;
-    padding-left: 100%; /* 從最右邊開始 */
-    /* 👈 改成使用變數計算速度 */
+    padding-left: 100%;
     animation: scrollLeft var(--marquee-duration, 15s) linear infinite; 
     white-space: nowrap;
   }
-
   .marquee-container.paused .marquee-content { animation-play-state: paused; }
-
   @keyframes scrollLeft {
     0% { transform: translateX(0); }
     100% { transform: translateX(-100%); }
@@ -219,22 +194,17 @@
   <div class="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<!-- 最新公告彈窗 -->
 <div id="announcementModal" class="modal-overlay" onclick="closeAnnouncementModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18"></path><path d="M21 11v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path><path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"></path><path d="M12 3v4"></path><path d="M12 16v4"></path></svg> 系統公告</h3>
     <div id="currentAnnouncementContent"></div>
-    
-    <!-- 把關閉按鈕的 margin-top 縮小一點，讓它稍微往上 -->
     <div class="modal-actions" style="margin-top: 16px;">
       <button class="go" onclick="closeAnnouncementModal()">關閉</button>
     </div>
-      <!-- 把歷史公告移到下面置中 -->
   <a class="history-link" style="text-align: center; display: block; width: 100%; font-style: italic; text-decoration: underline;" onclick="switchModal('announcementModal', 'historyAnnouncementModal')">查看歷史公告 &gt;</a>
   </div>
 </div>
 
-<!-- 歷史公告彈窗 -->
 <div id="historyAnnouncementModal" class="modal-overlay" onclick="closeAnnouncementModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
     <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="svg-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="9"></circle></svg> 歷史公告</h3>
@@ -244,7 +214,7 @@
 </div>
 
 <script>
-// 📢 系統公告資料（未來只要在這裡加資料即可）
+// 📢 系統公告資料
 const ANNOUNCEMENTS = [
   { date: "11/11 17:30(最後修改時間：22:40)", title: "★預計11/12將更新至2.0.0版本！\n• 版本維護時間：08:00~16:00(視維護情況可能提前或延後完成維護。)\n• 更新內容：操作介面全面煥新與全新功能即將上線！\n  ▶新增切換頁面功能，新增頁面為「設置」頁面。可自定義操作介面風格，包括背景顏色、頁面風格、文字顏色等個人化功能！詳情可等待2.0.0更新完成後自行體驗。\n  ▶新增功能：問題回報功能，刷題系統或是題目遇到任何問題？點擊填寫Mail即可進行回報！\n• 版本維護期間網站可正常使用。有一定概率會暫時無法使用，敬請見諒。版本維護後重新刷新介面，即會自動升級至2.0.0版本。" },
   { date: "11/11 17:00", title: "1.10.5版本已更新完畢。\n• 更新內容：新增系統公告功能，可關注網頁的最新消息。" },
@@ -288,16 +258,13 @@ function renderAnnouncements() {
   if (!ANNOUNCEMENTS.length) return;
   
   const latest = ANNOUNCEMENTS[0];
-  // 把前綴跟滾動內容分開
-const marqueeHTML = `
+  const marqueeHTML = `
   <div class="marquee-container" id="marqueeBar" onclick="openAnnouncementModal()">
-    <!-- 第一行：固定的標題 -->
     <div class="marquee-header">
       <span class="marquee-prefix">📢 系統公告</span>
       <span class="marquee-hint">[可點擊展開詳情]</span>
       <span class="marquee-prefix">：</span>
     </div>
-    <!-- 第二行：跑馬燈內容 -->
     <div class="marquee-content-wrapper">
       <div class="marquee-content" id="marqueeText">${latest.title}</div>
     </div>
@@ -310,15 +277,13 @@ const marqueeHTML = `
     document.querySelector('main').insertAdjacentHTML('afterbegin', marqueeHTML);
   }
 
-  // 👇 新增這段：動態計算定速時間 👇
   const marqueeEl = document.getElementById('marqueeText');
   if (marqueeEl) {
     const textWidth = marqueeEl.offsetWidth; 
-    const speed = 60; // 每秒跑 60 像素 (數字越大跑越快)
+    const speed = 60; 
     const duration = textWidth / speed;
     marqueeEl.style.setProperty('--marquee-duration', `${duration}s`);
   }
-  // 👆 新增結束 👆
 
   document.getElementById('currentAnnouncementContent').innerHTML = `
   <div class="announcement-item">
@@ -487,10 +452,35 @@ function start(m,v){
   show();
 }
 
+// 🌟 新增：自動尋找題組引文的邏輯
+function getQuestionText(q) {
+  let text = q.q;
+  // 檢查是否包含 (同第X題題組引文)
+  const match = text.match(/\(同第(\d+)題題組引文\)/);
+  if (match) {
+    const targetNum = match[1];
+    // 從題庫中尋找同年級、同題號的題目
+    const targetQ = Q.find(item => item.y === q.y && item.n === targetNum);
+    if (targetQ) {
+      // 將目標題目的引文部分（去除題目本身）抓出來
+      // 假設引文都包在【題組引文】...\n\n之間
+      const quoteMatch = targetQ.q.match(/【題組引文】([\s\S]*?)(?=\n\n|$)/);
+      if (quoteMatch) {
+        // 替換掉原本的提示字，換成引文
+        text = text.replace(/\(同第\d+題題組引文\)/, `【題組引文】\n${quoteMatch[1]}\n\n`);
+      }
+    }
+  }
+  return text;
+}
+
 function show(){
   const q=list[i];
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
+  
+  // 🌟 使用處理過後的題目文字
+  const displayText = getQuestionText(q);
 
   A.innerHTML=`<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--bd);">
@@ -498,10 +488,18 @@ function show(){
       <button onclick="prev()" ${i===0?'disabled':''} style="padding: 4px 10px; font-size: 0.8rem; margin: 0 8px; flex-shrink: 0;">上一題</button>
       <button onclick="home()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0; flex-shrink: 0;">結束</button>
     </div>
-    <p style="font-size: 1.1rem; font-weight: 500;">${q.q}</p>`+
+    <p style="font-size: 1.1rem; font-weight: 500;">${displayText}</p>`+
     q.o.map((t,k)=>{
       let cls = "opt";
-      if (done) { if (q.a.includes(L[k])) cls += " ok"; else if (picks.has(k)) cls += " no"; } 
+      if (done) { 
+        // 🌟 新的多選題視覺邏輯
+        if (q.a.includes(L[k])) {
+          if (picks.has(k)) { cls += " ok"; } // 有選且正確
+          else { cls += " missed"; }          // 沒選但正確（空心綠框）
+        } else if (picks.has(k)) { 
+          cls += " no";                       // 有選但錯誤
+        }
+      } 
       else if (picks.has(k)) cls += " sel";
       let cleanText = t.replace(/^\([A-E]\)\s*/, '').replace(/^[A-E][\.\、]\s*/, '');
       return `<button class="${cls}" id="o${k}" onclick="pick(${k})" ${done ? 'disabled' : ''}>(${L[k]}) ${cleanText}</button>`;
@@ -540,8 +538,14 @@ function submit(){
   q.o.forEach((_,k)=>{
     const b=document.getElementById("o"+k);
     b.classList.remove("sel");
-    if(q.a.includes(L[k]))b.classList.add("ok");
-    else if(picks.has(k))b.classList.add("no");
+    
+    // 🌟 送出後同步套用新的多選題視覺邏輯
+    if (q.a.includes(L[k])) {
+      if (picks.has(k)) b.classList.add("ok");
+      else b.classList.add("missed");
+    } else if (picks.has(k)) {
+      b.classList.add("no");
+    }
     b.disabled = true; 
   });
   
