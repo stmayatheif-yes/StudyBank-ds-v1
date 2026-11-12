@@ -452,23 +452,28 @@ function start(m,v){
   show();
 }
 
-// 🌟 新增：自動尋找題組引文的邏輯
+// 🌟 新增：自動尋找題組引文的邏輯 (包含表格)
 function getQuestionText(q) {
   let text = q.q;
-  // 檢查是否包含 (同第X題題組引文)
   const match = text.match(/\(同第(\d+)題題組引文\)/);
   if (match) {
     const targetNum = match[1];
-    // 從題庫中尋找同年級、同題號的題目
     const targetQ = Q.find(item => item.y === q.y && item.n === targetNum);
     if (targetQ) {
-      // 將目標題目的引文部分（去除題目本身）抓出來
-      // 假設引文都包在【題組引文】...\n\n之間
-      const quoteMatch = targetQ.q.match(/【題組引文】([\s\S]*?)(?=\n\n|$)/);
-      if (quoteMatch) {
-        // 替換掉原本的提示字，換成引文
-        text = text.replace(/\(同第\d+題題組引文\)/, `【題組引文】\n${quoteMatch[1]}\n\n`);
+      // 直接把目標題目的整段文字複製過來
+      const quoteText = targetQ.q;
+      
+      // 找到目標題目裡「最後一個換行」或「題目開始」的地方，保留前面的引文
+      // 通常引文後面會接著「1. ...」或「依據上文...」
+      let cleanQuote = quoteText;
+      const lastBreak = quoteText.lastIndexOf('\n\n');
+      if (lastBreak !== -1) {
+        // 如果引文跟題目之間有兩個換行，就把題目切掉，只留引文
+        cleanQuote = quoteText.substring(0, lastBreak);
       }
+
+      // 將本題的「(同第X題題組引文)」替換成抓過來的完整引文
+      text = text.replace(/\(同第\d+題題組引文\)/, `${cleanQuote}\n\n`);
     }
   }
   return text;
@@ -479,7 +484,6 @@ function show(){
   picks = new Set(userAnswers[id(q)] || []);
   done = userAnswers[id(q)] !== undefined;
   
-  // 🌟 使用處理過後的題目文字
   const displayText = getQuestionText(q);
 
   A.innerHTML=`<div class="card">
@@ -492,12 +496,11 @@ function show(){
     q.o.map((t,k)=>{
       let cls = "opt";
       if (done) { 
-        // 🌟 新的多選題視覺邏輯
         if (q.a.includes(L[k])) {
-          if (picks.has(k)) { cls += " ok"; } // 有選且正確
-          else { cls += " missed"; }          // 沒選但正確（空心綠框）
+          if (picks.has(k)) { cls += " ok"; } 
+          else { cls += " missed"; }
         } else if (picks.has(k)) { 
-          cls += " no";                       // 有選但錯誤
+          cls += " no"; 
         }
       } 
       else if (picks.has(k)) cls += " sel";
@@ -539,7 +542,6 @@ function submit(){
     const b=document.getElementById("o"+k);
     b.classList.remove("sel");
     
-    // 🌟 送出後同步套用新的多選題視覺邏輯
     if (q.a.includes(L[k])) {
       if (picks.has(k)) b.classList.add("ok");
       else b.classList.add("missed");
